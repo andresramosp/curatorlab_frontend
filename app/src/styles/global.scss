@@ -1,0 +1,237 @@
+.main-container {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: none;
+  margin-top: 0px;
+}
+
+.main-container.photos {
+  padding: 8px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.photo-card-match {
+  height: 290px;
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(var(--v-theme-surface-light)) !important;
+}
+
+.photo-card {
+  height: 290px;
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(var(--v-theme-surface-light)) !important;
+}
+
+.photo-card-upload {
+  width: 15%;
+  height: 151px;
+  position: relative;
+  overflow: hidden;
+  background-color: rgb(var(--v-theme-surface-light)) !important;
+}
+
+// .photo-card-insight {
+//   width: 16%;
+//   height: 290px;
+//   position: relative;
+//   overflow: hidden;
+//   background-color: rgb(var(--v-theme-surface-light)) !important;
+//   // border: 1px solid rgb(var(--v-theme-secondary)) !important;
+// }
+
+.photo-image-selected {
+  max-height: 63% !important;
+}
+
+.photo-image-insight {
+  max-height: 63% !important;
+}
+
+.photo-image-match {
+  max-height: 63% !important;
+}
+
+.centered-btn {
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+}
+
+.photo-image-big {
+  // object-fit: cover;
+  max-height: 400px !important;
+  object-fit: none !important;
+}
+
+.v-img__img--contain {
+  object-fit: scale-down;
+}
+
+.v-btn:not(.switch):not(.outline) {
+  background-color: rgb(var(--v-theme-secondary)) !important;
+  color: rgb(var(--v-theme-on-secondary)) !important;
+}
+
+.v-btn.switch {
+  border-radius: 15px;
+}
+
+.v-btn.outline {
+  // background-color: rgb(var(--v-theme-surface-light)) !important;
+  border: 1px solid rgb(var(--v-theme-secondary));
+}
+
+.v-btn.switch.on {
+  background-color: rgb(var(--v-theme-secondary)) !important;
+  color: rgb(var(--v-theme-surface)) !important;
+}
+
+.v-btn.switch.off {
+  background-color: transparent !important;
+}
+
+/* Para Chrome, Edge y Safari */
+.photos-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.photos-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.photos-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.photos-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.photos-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.photo-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.toolbar-control {
+  font-size: 9px !important;
+  .v-label {
+    font-size: 11px !important;
+  }
+}
+
+.action-buttons {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  /* background: rgba(0, 0, 0, 0.6); */
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.grid-floating-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+
+  bottom: 62px;
+}
+
+.switch-compact .v-label {
+  font-size: 12px !important;
+  margin-inline-start: 4px;
+}
+
+// .select-compact .v-label {
+//   font-size: 12px !important;
+//   margin-bottom: -2px;
+// }
+
+.select-compact {
+  font-size: 12px; /* valor seleccionado */
+}
+
+.select-compact .v-select__selection-text {
+  font-size: 12px; /* valor seleccionado */
+}
+
+.select-compact .v-label,
+.text-compact .v-label {
+  font-size: 11px !important; /* título flotante (label) más pequeño */
+  opacity: 0.7;
+  transform: translateY(-4px) scale(0.9); /* opcional para refinar */
+}
+
+.select-compact .v-list-item-title {
+  font-size: 12px; /* opciones del dropdown */
+}
+
+// .v-toolbar {
+//   background-color: red !important;
+// }
+
+// .blurred-photo {
+//   filter: blur(15px);
+// }
+
+@keyframes unblur {
+  0% {
+    filter: blur(20px);
+  }
+  100% {
+    filter: blur(1px);
+  }
+}
+
+.blurred-photo {
+  animation: unblur 10s forwards steps(18);
+}
+
+.search-fixed-button {
+  position: sticky;
+  bottom: 0px;
+  background: var(--v-theme-surface);
+  padding: 10px;
+  z-index: 1;
+}
+.search-button-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.alert-message {
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+  position: absolute;
+  bottom: 90px;
+  flex-direction: row;
+}
+
+.alert-text {
+  font-size: 14px;
+  width: 500px;
+}

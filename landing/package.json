@@ -1,0 +1,27 @@
+{
+  "name": "open-pro-vue",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@headlessui/tailwindcss": "^0.2.1",
+    "@headlessui/vue": "^1.7.23",
+    "aos": "3.0.0-beta.6",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/postcss": "^4.0.3",
+    "@tailwindcss/typography": "^0.5.16",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/compiler-sfc": "^3.5.13",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.0.3",
+    "vite": "^6.0.11"
+  }
+}
