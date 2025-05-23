@@ -159,11 +159,7 @@
             >
               <img
                 style="width: 16px; margin-right: 3.5px"
-                :src="
-                  searchMode == 'curation' || searchType != 'semantic'
-                    ? logoGray
-                    : logoGreen
-                "
+                :src="logoGray"
                 alt="CuratorLab Logo"
               />
 
