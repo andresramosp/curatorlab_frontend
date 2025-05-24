@@ -18,13 +18,15 @@ const comingSoon = () => alert("Coming soon!");
           <h1
             class="flex items-center justify-center gap-2 font-nacelle animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-5 text-4xl font-semibold text-transparent md:text-5xl"
             data-aos="fade-up"
+            style="gap: 3px"
           >
             <img
               class="w-16 h-16"
               src="../images/CuratorLogoGray.png"
               alt="CuratorLab Logo"
             />
-            CuratorLab
+            <span style="">Curator</span
+            ><span style="color: white; font-weight: bold">Lab</span>
           </h1>
 
           <div class="mx-auto max-w-3xl">
