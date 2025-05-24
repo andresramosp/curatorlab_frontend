@@ -46,7 +46,7 @@
 
 <script setup>
 import { useRouter } from "vue-router";
-import logoText from "@/assets/logo.png";
+import logoText from "@/assets/logo_green.png";
 import logo from "@/assets/CuratorLogoGray.png";
 
 const router = useRouter();

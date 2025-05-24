@@ -275,7 +275,6 @@ import { useCanvasStore } from "@/stores/canvas";
 import { useRouter } from "vue-router";
 import queryExamples from "@/assets/query_examples.json";
 import logoGray from "@/assets/CuratorLogoGray.png";
-import logoGreen from "@/assets/CuratorLogo.png";
 
 const socket = io(import.meta.env.VITE_API_WS_URL);
 

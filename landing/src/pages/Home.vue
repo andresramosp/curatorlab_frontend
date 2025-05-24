@@ -15,7 +15,7 @@ import Footer from "./../partials/Footer.vue";
     class="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip"
   >
     <!-- Site header -->
-    <Header />
+    <!-- <Header /> -->
 
     <!-- Page content -->
     <main class="relative grow">
@@ -24,8 +24,8 @@ import Footer from "./../partials/Footer.vue";
 
       <!-- Page sections -->
       <HeroHome />
-      <Workflows />
-      <Features />
+      <!-- <Workflows />
+      <Features /> -->
       <!-- <SplitCarousel /> -->
       <!-- <PricingHome /> -->
       <!-- <Cta /> -->
