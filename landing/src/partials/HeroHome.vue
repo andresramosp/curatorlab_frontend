@@ -21,7 +21,7 @@ const comingSoon = () => alert("Coming soon!");
             style="gap: 3px"
           >
             <img
-              class="w-16 h-16"
+              class="w-14 h-14"
               src="../images/CuratorLogoGray.png"
               alt="CuratorLab Logo"
             />
