@@ -36,11 +36,12 @@ const comingSoon = () => alert("Coming soon!");
               data-aos="fade-up"
               data-aos-delay="200"
             >
-              Unleash the full potential of your photographic work. Search your
-              archive by concept, emotion or context. Build powerful series for
-              artistic or documentary purposes. Sequence images by narrative,
-              visual rhythm, or semantic connection. And this is just the
-              beginning…
+              Start making sense of your photographic body of work like never
+              before with the help of our powerful engine. 🕵️ Explore through
+              descriptive or figurative queries. 🖼️ Build series for artistic or
+              documentary projects. 🧭 Sequence images by narrative or visual
+              rhythm, uncovering connections you hadn’t noticed before. And much
+              more to come...
             </p>
             <div
               class="mx-auto max-w-xs sm:flex sm:max-w-none sm:justify-center"
