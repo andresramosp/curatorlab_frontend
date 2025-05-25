@@ -31,7 +31,7 @@ const comingSoon = () => alert("Coming soon!");
 
           <div class="mx-auto max-w-3xl">
             <p
-              style="font-size: 17px"
+              style="font-size: 16px"
               class="mb-8 text-xl text-indigo-200/65"
               data-aos="fade-up"
               data-aos-delay="200"
