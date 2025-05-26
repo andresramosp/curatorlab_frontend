@@ -506,9 +506,13 @@ async function nextIteration() {
 
 async function moveToCanvas() {
   await photosStore.getOrFetch();
+  await Promise.all(
+    photosStore.selectedPhotoIds.map((id) => photosStore.fetchPhoto(id))
+  );
   const photosToAdd = photosStore.selectedPhotoIds
-    .map((id) => photosStore.photos.find((p) => p.id == id))
-    .filter(Boolean); // por si acaso
+    .map((id) => photosStore.photos.find((p) => p.id === id))
+    .filter(Boolean);
+
   canvasStore.addPhotos(photosToAdd);
   router.push("/canvas");
 }
