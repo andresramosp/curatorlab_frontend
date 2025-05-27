@@ -78,7 +78,7 @@ import { useTheme } from "vuetify";
 import PhotoCanvasButton from "./PhotoCanvasButton.vue";
 
 const theme = useTheme();
-const secondaryColor = theme.current.value.colors.secondary;
+const secondaryColor = theme.current.value.colors.accent;
 const props = defineProps({
   photo: Object,
   enableDiagonal: Boolean,

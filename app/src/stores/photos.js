@@ -62,7 +62,7 @@ export const usePhotosStore = defineStore("photos", {
           `${import.meta.env.VITE_API_BASE_URL}/api/catalog/${photoId}`
         );
         const updatedPhoto = photo;
-        const index = this.photos.findIndex((p) => p.id === photoId);
+        const index = this.photos.findIndex((p) => p.id == photoId);
         if (index !== -1) {
           this.photos[index] = { ...this.photos[index], ...updatedPhoto };
         } else {

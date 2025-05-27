@@ -51,10 +51,10 @@
         </div>
       </li>
 
-      <!-- Settings -->
+      <!-- Expansion Criteria -->
       <li class="section">
         <div class="text-caption font-weight-medium text-grey-lighten-1 mb-1">
-          Settings
+          Expansion Criteria
         </div>
         <v-select
           label="Expansion type"
@@ -69,7 +69,7 @@
         <v-row dense align="center" justify="space-around" class="mt-2">
           <v-switch
             label="Inverted"
-            color="secondary"
+            color="acce"
             class="switch-compact"
             v-model="toolbarState.expansion.inverted"
             density="compact"
@@ -89,21 +89,28 @@
       <!-- Photo Expansion -->
       <li class="section">
         <div class="text-caption font-weight-medium text-grey-lighten-1 mb-1">
-          Photo Expansion
+          Arrangement
         </div>
-        <v-row dense>
-          <v-col>
-            <v-select
-              label="Number"
-              :items="[1, 2, 3, 4, 5]"
-              v-model.number="toolbarState.photoOptions.count"
-              density="compact"
-              hide-details
-              class="select-compact mt-1"
-              style="width: 120px"
-            />
-          </v-col>
-        </v-row>
+        <div class="d-flex justify-space-between" style="gap: 15px">
+          <v-select
+            label="Number"
+            :items="[1, 2, 3, 4, 5]"
+            v-model.number="toolbarState.photoOptions.count"
+            density="compact"
+            hide-details
+            class="select-compact mt-1"
+            style="width: 10px"
+          />
+
+          <v-switch
+            label="Auto align"
+            color="secondary"
+            class="switch-compact"
+            v-model="toolbarState.expansion.autoAlign"
+            density="compact"
+            hide-details
+          />
+        </div>
 
         <div class="d-flex justify-space-around mt-2">
           <ToggleButtons v-model="toolbarState.photoOptions.spreadMode">

@@ -64,7 +64,7 @@
               y: selectionRect.y,
               width: selectionRect.width,
               height: selectionRect.height,
-              stroke: secondaryColor,
+              stroke: accentColor,
               dash: [4, 4],
             }"
           />
@@ -82,7 +82,9 @@
               _isPhoto: true,
             }"
             @dragstart="handleDragStart(photo, $event)"
-            @dragend="handleDragEnd(photo, $event)"
+            @dragend="
+              handleDragEnd(photo, $event, toolbarState.expansion.autoAlign)
+            "
             @dragmove="handleDragMove(photo, $event)"
             @click="handleSelectPhoto(photo, $event)"
           >
@@ -243,6 +245,7 @@ const toolbarState = ref({
     type: { criteria: "embedding" },
     inverted: false,
     opposite: false,
+    autoAlign: true,
   },
   photoOptions: {
     count: 1,
@@ -262,6 +265,7 @@ const dialogTrashVisible = ref(false);
 
 const theme = useTheme();
 const secondaryColor = theme.current.value.colors.secondary;
+const accentColor = theme.current.value.colors.accent;
 const primaryColor = theme.current.value.colors.primary;
 
 const {
@@ -339,7 +343,7 @@ const handleAddPhotoFromPhoto = async (event) => {
 
 const getPhotoStrokeColor = (photo) => {
   if (photo.inTrash) return "rgba(250, 11, 11, 0.5)";
-  if (photo.selected) return secondaryColor;
+  if (photo.selected) return accentColor;
   if (photo.hovered) return primaryColor;
   return "gray";
 };
@@ -435,9 +439,9 @@ async function handleAddPhotos(photoIds) {
   await Promise.all(photoIds.map((id) => photosStore.fetchPhoto(id)));
 
   const photosToAdd = photoIds
-    .map((id) => photosStore.photos.find((p) => p.id === id))
+    .map((id) => photosStore.photos.find((p) => p.id == id))
     .filter(Boolean);
-
+  debugger;
   canvasStore.addPhotos(photosToAdd);
   fitStageToPhotos();
 }
@@ -548,7 +552,6 @@ watch(
   flex-direction: column;
   gap: 7px;
   z-index: 300;
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   padding: 8px;
 }

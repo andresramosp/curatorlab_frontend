@@ -29,14 +29,14 @@
         <!-- Iconos informativos seleccion/deselección -->
         <div v-if="!isThinking" class="photo-icons">
           <div v-if="photo.selected">
-            <v-icon color="secondary">mdi-check</v-icon>
+            <v-icon color="accent">mdi-check</v-icon>
           </div>
           <!-- <div v-else-if="photo.matchScore == 3" class="high-match">
             <img style="width: 19px;" :src="logo" alt="CuratorLab Logo"></img>
           </div> -->
           <div v-else-if="showMatchPercent" :class="[matchPercentClass]">
             <v-icon
-              :color="starCount >= 3 ? 'secondary' : 'gray'"
+              :color="starCount >= 3 ? 'accent' : 'gray'"
               style="font-size: 15px; opacity: 1"
               v-for="n in starCount"
               :key="n"
@@ -78,7 +78,7 @@ const cardStyle = computed(() => ({
   width: props.size,
   animationDelay: `${props.fadeDelay}ms`,
   border: photosStore.selectedPhotoIds.includes(props.photo.id.toString())
-    ? "1px solid rgb(var(--v-theme-secondary)) !important"
+    ? "1px solid rgb(var(--v-theme-accent)) !important"
     : "none",
 }));
 

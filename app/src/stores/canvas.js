@@ -43,7 +43,8 @@ export const useCanvasStore = defineStore("canvas", {
   actions: {
     addPhotos(photoObjects) {
       photoObjects.forEach((photo, index) => {
-        if (!this.photos.some((p) => p.id === photo.id)) {
+        if (!this.photos.some((p) => p.id == photo.id)) {
+          debugger;
           this.photos.push(
             createPhoto(photo, undefined, false, this.currentZIndex, index)
           );

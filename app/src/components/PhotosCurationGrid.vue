@@ -47,7 +47,7 @@
                   <template #activator="{ props: tooltipProps }">
                     <v-icon
                       v-bind="tooltipProps"
-                      :color="props.isFilled ? 'secondary' : 'primary'"
+                      :color="props.isFilled ? 'accent' : 'primary'"
                       size="17px"
                     >
                       mdi-star
@@ -399,10 +399,6 @@ function toggleSelection(photo) {
     opacity: 0.4;
     transform: scale(1);
   }
-}
-
-.top-score-photo {
-  border: 3px solid rgb(var(--v-theme-secondary));
 }
 
 .reasoning-overlay {
