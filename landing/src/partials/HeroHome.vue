@@ -40,7 +40,7 @@ const comingSoon = () => alert("Coming soon!");
               before with the help of our powerful engine. 🕵️ Explore through
               descriptive or figurative queries. 🖼️ Build series for artistic or
               documentary projects. 🧭 Sequence images by narrative or visual
-              rhythm, uncovering connections you hadn’t noticed before. And much
+              rhythm and uncover new connections. And much
               more to come...
             </p>
             <div
