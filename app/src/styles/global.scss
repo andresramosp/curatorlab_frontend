@@ -235,3 +235,11 @@
   font-size: 14px;
   width: 500px;
 }
+
+.highlight-tag-positive {
+  background-color: rgb(var(--v-theme-accent)) !important;
+  color: darkslategray !important;
+}
+.highlight-tag-negative {
+  background-color: red !important;
+}

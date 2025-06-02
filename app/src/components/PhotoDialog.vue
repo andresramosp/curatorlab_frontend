@@ -205,11 +205,4 @@ const groupedTags = computed(() => {
   background-color: red;
   opacity: 0.6;
 }
-.highlight-tag-positive {
-  background-color: rgb(var(--v-theme-secondary)) !important;
-  color: darkslategray !important;
-}
-.highlight-tag-negative {
-  background-color: red !important;
-}
 </style>

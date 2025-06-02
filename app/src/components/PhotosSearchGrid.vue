@@ -24,16 +24,31 @@
               :size="'16%'"
             >
               <template #overlay="{ isHovering, photo }">
+                <!-- Botón de info como pequeña 'i' en esquina superior izquierda -->
+                <div v-show="!loadingIteration && !loading" class="info-button">
+                  <v-btn
+                    size="x-small"
+                    icon
+                    @click.stop="viewPhotoInfo(photo)"
+                    class="info-btn"
+                  >
+                    <v-icon size="12">mdi-information</v-icon>
+                  </v-btn>
+                </div>
+
+                <!-- Pills de tags matcheados en la parte inferior -->
                 <div
-                  v-show="isHovering && !loadingIteration && !loading"
-                  class="action-buttons"
+                  v-show="photo.matchingTags && photo.matchingTags.length > 0"
+                  class="matching-tags"
                 >
-                  <v-btn size="small" icon @click.stop="viewPhotoInfo(photo)">
-                    <v-icon>mdi-information</v-icon>
-                  </v-btn>
-                  <v-btn size="small" icon @click="deletePhoto(photo.id)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
+                  <v-chip
+                    v-for="tag in photo.matchingTags"
+                    :key="tag.name || tag"
+                    size="x-small"
+                    class="tag-pill highlight-tag-positive"
+                  >
+                    {{ tag.name || tag }}
+                  </v-chip>
                 </div>
               </template>
             </PhotoCard>
@@ -56,15 +71,6 @@
         </div>
       </v-card>
     </div>
-    <!-- <v-btn
-      style="padding: 0px; width: 99%; margin-top: 5px"
-      :loading="loadingIteration"
-      @click="$emit('next-iteration')"
-      class="centered-btn outline"
-      :disabled="!hasMoreIterations || loadingIteration || loadingInsights"
-    >
-      <v-icon size="23">mdi-autorenew</v-icon> Load More
-    </v-btn> -->
   </div>
 
   <PhotoDialog v-model:dialog="showDialog" :selected-photo="selectedPhoto" />
@@ -143,7 +149,6 @@ function deletePhoto(id) {
 .photos-grid {
   display: flex;
   flex-direction: column;
-  /* gap: 16px; */
   width: 100%;
 }
 
@@ -154,6 +159,34 @@ function deletePhoto(id) {
   align-items: center;
   color: #666;
   font-size: 18px;
+}
+
+/* Estilos para el botón de info en esquina superior izquierda */
+.info-button {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 10;
+}
+
+.info-btn {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  color: white !important;
+  min-width: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+/* Estilos para las pills de tags en la parte inferior */
+.matching-tags {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  z-index: 5;
 }
 
 .thinking-overlay {

@@ -31,9 +31,6 @@
           <div v-if="photo.selected">
             <v-icon color="accent">mdi-check</v-icon>
           </div>
-          <!-- <div v-else-if="photo.matchScore == 3" class="high-match">
-            <img style="width: 19px;" :src="logo" alt="CuratorLab Logo"></img>
-          </div> -->
           <div v-else-if="showMatchPercent" :class="[matchPercentClass]">
             <v-icon
               :color="starCount >= 3 ? 'accent' : 'gray'"
@@ -80,6 +77,7 @@ const cardStyle = computed(() => ({
   border: photosStore.selectedPhotoIds.includes(props.photo.id.toString())
     ? "1px solid rgb(var(--v-theme-accent)) !important"
     : "none",
+  position: "relative", // Asegurar que el contenedor sea relativo para los elementos absolutos
 }));
 
 const handleClick = () => {
@@ -121,10 +119,10 @@ const starCount = computed(() => {
   top: 4px;
   right: 4px;
   font-size: 13px;
+  z-index: 15; /* Mayor z-index para que aparezca sobre las pills */
 }
 
 .high-match {
-  /* color: rgb(var(--v-theme-secondary)); */
   color: white;
 }
 .medium-match {
@@ -136,10 +134,11 @@ const starCount = computed(() => {
 
 .image-container {
   display: flex;
-  align-items: center; /* Centrado vertical */
-  justify-content: center; /* Opcional, para centrar horizontalmente */
+  align-items: center;
+  justify-content: center;
   height: 100%;
   padding: 1px;
+  position: relative; /* Para que los elementos overlay se posicionen correctamente */
 }
 
 .photo-skeleton {
@@ -162,5 +161,11 @@ const starCount = computed(() => {
   opacity: 0;
   transform: translateY(70px);
   animation: appearUp 0.4s ease forwards;
+}
+
+/* Asegurar que la tarjeta tenga posición relativa para los overlays */
+.photo-card {
+  position: relative;
+  overflow: hidden;
 }
 </style>
