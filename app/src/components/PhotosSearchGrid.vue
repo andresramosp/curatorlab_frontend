@@ -26,23 +26,22 @@
               <template #overlay="{ isHovering, photo }">
                 <!-- Botón de info como pequeña 'i' en esquina superior izquierda -->
                 <div v-show="!loadingIteration && !loading" class="info-button">
-                  <v-btn
-                    size="x-small"
-                    icon
-                    @click.stop="viewPhotoInfo(photo)"
-                    class="info-btn"
+                  <v-icon @click.stop="viewPhotoInfo(photo)" size="15"
+                    >mdi-information-outline</v-icon
                   >
-                    <v-icon size="12">mdi-information</v-icon>
-                  </v-btn>
                 </div>
 
                 <!-- Pills de tags matcheados en la parte inferior -->
                 <div
-                  v-show="photo.matchingTags && photo.matchingTags.length > 0"
+                  v-show="
+                    isHovering &&
+                    photo.matchingTags &&
+                    photo.matchingTags.length > 0
+                  "
                   class="matching-tags"
                 >
                   <v-chip
-                    v-for="tag in photo.matchingTags"
+                    v-for="tag in getTopMatchingTags(photo)"
                     :key="tag.name || tag"
                     size="x-small"
                     class="tag-pill highlight-tag-positive"
@@ -127,6 +126,30 @@ const isThinking = (photo) => {
   return props.loadingInsights && photo.matchScore === undefined;
 };
 
+function getTopMatchingTags(photo) {
+  if (!photo.matchingTags || !Array.isArray(photo.matchingTags)) return [];
+
+  // Crear un Map para mantener solo el tag con mayor proximity por nombre
+  const uniqueTagsMap = new Map();
+
+  photo.matchingTags.forEach((tag) => {
+    const tagName = tag.name || tag;
+    const proximity = tag.proximity || 0;
+
+    if (
+      !uniqueTagsMap.has(tagName) ||
+      uniqueTagsMap.get(tagName).proximity < proximity
+    ) {
+      uniqueTagsMap.set(tagName, tag);
+    }
+  });
+
+  // Convertir a array, ordenar por proximity (descendente) y tomar solo los primeros 5
+  return Array.from(uniqueTagsMap.values())
+    .sort((a, b) => (b.proximity || 0) - (a.proximity || 0))
+    .slice(0, 5);
+}
+
 function deletePhoto(id) {
   // Placeholder: implement delete logic here
   console.log("Delete photo", id);
@@ -164,7 +187,7 @@ function deletePhoto(id) {
 /* Estilos para el botón de info en esquina superior izquierda */
 .info-button {
   position: absolute;
-  top: 4px;
+  top: 2px;
   left: 4px;
   z-index: 10;
 }
@@ -185,8 +208,15 @@ function deletePhoto(id) {
   right: 4px;
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: 4px;
   z-index: 5;
+  padding: 5px;
+}
+
+.tag-pill {
+  font-size: 10px !important;
+  height: 18px !important;
+  border-radius: 9px !important;
 }
 
 .thinking-overlay {
