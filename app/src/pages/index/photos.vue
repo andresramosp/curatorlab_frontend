@@ -113,11 +113,42 @@ async function uploadLocalFiles(event) {
 
   uploadingPhotos.value = selectedFiles.length;
 
+  const uploadedPhotos = [];
+
   try {
     await Promise.all(
-      selectedFiles.map((file) => limit(() => processAndUploadFile(file)))
+      selectedFiles.map((file) =>
+        limit(() =>
+          processAndUploadFile(file).then((photo) => {
+            if (photo) uploadedPhotos.push(photo);
+          })
+        )
+      )
     );
+
     await photosStore.getOrFetch(true);
+
+    // 🔍 Check for duplicates
+    const ids = uploadedPhotos.map((p) => p.id);
+    if (ids.length > 0) {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/catalog/checkDuplicates`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newPhotoIds: ids }),
+        }
+      );
+
+      const duplicatesMap = await res.json();
+
+      // 🔄 Añadir prop `duplicates` a cada foto en el store
+      for (const photo of photosStore.photos) {
+        if (duplicatesMap[photo.id]) {
+          photo.duplicates = duplicatesMap[photo.id];
+        }
+      }
+    }
   } catch (error) {
     console.error("❌ Error en la subida:", error);
   } finally {
@@ -127,13 +158,11 @@ async function uploadLocalFiles(event) {
 }
 
 async function processAndUploadFile(file) {
-  // Redimensionar original y thumbnail en paralelo
   const [resizedBlob, thumbnailBlob] = await Promise.all([
     resizeImage(file, 1500),
     resizeImage(file, 800),
   ]);
 
-  // Pedir URLs firmadas al backend
   const res = await fetch(
     `${import.meta.env.VITE_API_BASE_URL}/api/catalog/uploadLocal`,
     {
@@ -146,7 +175,6 @@ async function processAndUploadFile(file) {
   if (!res.ok) throw new Error("Error obteniendo URLs firmadas");
   const { uploadUrl, thumbnailUploadUrl, photo } = await res.json();
 
-  // Subir original y thumbnail en paralelo
   await Promise.all([
     fetch(uploadUrl, {
       method: "PUT",
@@ -168,6 +196,8 @@ async function processAndUploadFile(file) {
   //   headers: { 'Content-Type': 'application/json' },
   //   body: JSON.stringify({ key, publicUrl }),
   // })
+
+  return photo;
 }
 
 async function resizeImage(file, targetWidth) {

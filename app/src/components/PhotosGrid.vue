@@ -9,6 +9,15 @@
               class="photo-image"
               @error="fallbackImage(photo)"
             ></v-img>
+            <v-icon
+              v-if="photo.duplicates?.length"
+              class="duplicate-icon"
+              size="20"
+              color="orange"
+              @click.stop="openDuplicatesDialog(photo)"
+            >
+              mdi-alert
+            </v-icon>
 
             <div
               v-show="isHovering && !needProcess(photo).isAnalyzing"
@@ -38,6 +47,11 @@
       /></v-card>
     </div> -->
     <PhotoDialog v-model:dialog="showDialog" :selected-photo="selectedPhoto" />
+    <PhotoDuplicatesDialog
+      v-model="showDuplicatesDialog"
+      :photos="duplicatePhotos"
+      @delete="deletePhoto"
+    />
   </div>
 </template>
 
@@ -45,6 +59,7 @@
 import { ref, computed } from "vue";
 import { usePhotosStore } from "@/stores/photos";
 import PhotoDialog from "./PhotoDialog.vue";
+import PhotoDuplicatesDialog from "./PhotoDuplicatesDialog.vue";
 
 const props = defineProps({
   photos: Array,
@@ -57,6 +72,9 @@ const photosStore = usePhotosStore();
 
 const showDialog = ref(false);
 const selectedPhotoId = ref(null);
+
+const showDuplicatesDialog = ref(false);
+const duplicatePhotos = ref([]);
 
 // Accede al store para obtener la foto completa
 const selectedPhoto = computed(() =>
@@ -88,6 +106,13 @@ function fallbackImage(photo) {
   if (photo.url) {
     photo.url = null;
   }
+}
+
+function openDuplicatesDialog(photo) {
+  duplicatePhotos.value = photosStore.photos.filter((p) =>
+    photo.duplicates.includes(p.id)
+  );
+  showDuplicatesDialog.value = true;
 }
 </script>
 
@@ -121,5 +146,14 @@ function fallbackImage(photo) {
 
 .blurred-photo {
   filter: blur(3px);
+}
+.duplicate-icon {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+  background: white;
+  border-radius: 50%;
+  padding: 2px;
 }
 </style>
