@@ -1,7 +1,13 @@
 <template>
   <div>
-    <div v-if="photos && photos.length" class="photos-list">
-      <v-hover v-for="photo in photos" :key="photo.id">
+    <v-switch
+      v-model="showOnlyDuplicates"
+      label="Filter duplicates"
+      class="mb-4"
+    />
+
+    <div v-if="filteredPhotos.length" class="photos-list">
+      <v-hover v-for="photo in filteredPhotos" :key="photo.id">
         <template #default="{ isHovering, props }">
           <v-card v-bind="props" class="photo-card-upload">
             <v-img
@@ -37,15 +43,7 @@
         </template>
       </v-hover>
     </div>
-    <!-- <div v-else class="photos-list">
-      <v-card
-        v-for="n in uploadingPhotos"
-        v-bind="props"
-        class="photo-card-upload"
-      >
-        <v-skeleton-loader :key="n" type="image" class="photo-skeleton"
-      /></v-card>
-    </div> -->
+
     <PhotoDialog v-model:dialog="showDialog" :selected-photo="selectedPhoto" />
     <PhotoDuplicatesDialog
       v-model="showDuplicatesDialog"
@@ -70,13 +68,19 @@ const props = defineProps({
 
 const photosStore = usePhotosStore();
 
+const showOnlyDuplicates = ref(false);
 const showDialog = ref(false);
 const selectedPhotoId = ref(null);
-
 const showDuplicatesDialog = ref(false);
 const duplicatePhotos = ref([]);
 
-// Accede al store para obtener la foto completa
+const filteredPhotos = computed(() => {
+  if (!props.photos) return [];
+  return showOnlyDuplicates.value
+    ? props.photos.filter((p) => p.duplicates?.length)
+    : props.photos;
+});
+
 const selectedPhoto = computed(() =>
   photosStore.photos.find((p) => p.id === selectedPhotoId.value)
 );
@@ -89,16 +93,13 @@ function needProcess(photo) {
 
 async function deleteDuplicates(photoIds) {
   await photosStore.deleteDuplicates(photoIds);
-  // await photosStore.getOrFetch(true);
   await photosStore.checkDuplicates(photoIds);
   showDuplicatesDialog.value = false;
 }
 
 async function deletePhoto(photo) {
   await photosStore.deletePhoto(photo.id);
-  // await photosStore.getOrFetch(true);
   await photosStore.checkDuplicates(photo.duplicates);
-
   showDuplicatesDialog.value = false;
 }
 
