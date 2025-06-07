@@ -86,11 +86,15 @@ export const usePhotosStore = defineStore("photos", {
 
     async deleteDuplicates(photosIds) {
       try {
-        await axios.post(
+        const res = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/api/catalog/deleteDuplicates`,
           { duplicates: photosIds }
         );
-        this.photos = this.photos.filter((photo) => photo.id !== photoId);
+
+        const { deleted } = res.data;
+
+        // Elimina las fotos borradas del store
+        this.photos = this.photos.filter((p) => !deleted.includes(p.id));
       } catch (error) {
         console.error("Error deleting photo:", error);
       }
@@ -112,7 +116,9 @@ export const usePhotosStore = defineStore("photos", {
         const duplicatesMap = await res.json();
 
         for (const photo of this.photos) {
-          photo.duplicates = duplicatesMap[photo.id] || [];
+          if (!photoIds || photoIds.includes(photo.id)) {
+            photo.duplicates = duplicatesMap[photo.id] || [];
+          }
         }
 
         return duplicatesMap;

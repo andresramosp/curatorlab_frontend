@@ -12,18 +12,18 @@
             <v-icon
               v-if="photo.duplicates?.length"
               class="duplicate-icon"
-              size="20"
+              size="24"
               color="orange"
               @click.stop="openDuplicatesDialog(photo)"
             >
-              mdi-alert
+              mdi-account-box-multiple
             </v-icon>
 
             <div
               v-show="isHovering && !needProcess(photo).isAnalyzing"
               class="action-buttons"
             >
-              <v-btn size="small" icon @click="deletePhoto(photo.id)">
+              <v-btn size="small" icon @click="deletePhoto(photo)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
               <v-btn size="small" icon @click="editPhoto(photo.id)">
@@ -89,15 +89,16 @@ function needProcess(photo) {
 
 async function deleteDuplicates(photoIds) {
   await photosStore.deleteDuplicates(photoIds);
-  await photosStore.getOrFetch(true);
-  await photosStore.checkDuplicates();
+  // await photosStore.getOrFetch(true);
+  await photosStore.checkDuplicates(photoIds);
   showDuplicatesDialog.value = false;
 }
 
-async function deletePhoto(photoId) {
-  await photosStore.deletePhoto(photoId);
-  await photosStore.getOrFetch(true);
-  await photosStore.checkDuplicates();
+async function deletePhoto(photo) {
+  await photosStore.deletePhoto(photo.id);
+  // await photosStore.getOrFetch(true);
+  await photosStore.checkDuplicates(photo.duplicates);
+
   showDuplicatesDialog.value = false;
 }
 
@@ -159,10 +160,9 @@ function openDuplicatesDialog(photo) {
 }
 .duplicate-icon {
   position: absolute;
-  top: 6px;
+  top: 4px;
   left: 6px;
   z-index: 2;
-  background: white;
   border-radius: 50%;
   padding: 2px;
 }
