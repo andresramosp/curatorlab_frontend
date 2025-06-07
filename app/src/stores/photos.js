@@ -84,6 +84,44 @@ export const usePhotosStore = defineStore("photos", {
       }
     },
 
+    async deleteDuplicates(photosIds) {
+      try {
+        await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/api/catalog/deleteDuplicates`,
+          { duplicates: photosIds }
+        );
+        this.photos = this.photos.filter((photo) => photo.id !== photoId);
+      } catch (error) {
+        console.error("Error deleting photo:", error);
+      }
+    },
+
+    async checkDuplicates(photoIds = null) {
+      try {
+        const payload = photoIds ? { newPhotoIds: photoIds } : {};
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/catalog/checkDuplicates`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!res.ok) throw new Error("Error al consultar duplicados");
+        const duplicatesMap = await res.json();
+
+        for (const photo of this.photos) {
+          photo.duplicates = duplicatesMap[photo.id] || [];
+        }
+
+        return duplicatesMap;
+      } catch (error) {
+        console.error("❌ Error en checkDuplicates:", error);
+        return {};
+      }
+    },
+
     togglePhotoSelection(photoId) {
       this.selectedPhotosRecord[photoId] = !this.selectedPhotosRecord[photoId];
     },

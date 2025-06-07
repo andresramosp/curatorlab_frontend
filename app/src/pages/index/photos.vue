@@ -128,27 +128,7 @@ async function uploadLocalFiles(event) {
 
     await photosStore.getOrFetch(true);
 
-    // 🔍 Check for duplicates
-    const ids = uploadedPhotos.map((p) => p.id);
-    if (ids.length > 0) {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/catalog/checkDuplicates`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ newPhotoIds: ids }),
-        }
-      );
-
-      const duplicatesMap = await res.json();
-
-      // 🔄 Añadir prop `duplicates` a cada foto en el store
-      for (const photo of photosStore.photos) {
-        if (duplicatesMap[photo.id]) {
-          photo.duplicates = duplicatesMap[photo.id];
-        }
-      }
-    }
+    await checkDuplicates(uploadedPhotos.map((p) => p.id));
   } catch (error) {
     console.error("❌ Error en la subida:", error);
   } finally {
@@ -360,10 +340,34 @@ const checkGooglePhotosCallback = () => {
   }
 };
 
+async function checkDuplicates(photoIds = null) {
+  try {
+    const payload = photoIds ? { newPhotoIds: photoIds } : {};
+    const res = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/catalog/checkDuplicates`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (!res.ok) throw new Error("Error al consultar duplicados");
+    const duplicatesMap = await res.json();
+
+    for (const photo of photosStore.photos) {
+      photo.duplicates = duplicatesMap[photo.id] || [];
+    }
+  } catch (error) {
+    console.error("❌ Error en checkDuplicates:", error);
+  }
+}
+
 /** 🔹 Configuración de WebSockets */
-onMounted(() => {
+onMounted(async () => {
   checkGooglePhotosCallback();
-  photosStore.getOrFetch();
+  await photosStore.getOrFetch();
+  await checkDuplicates();
 
   socket.on("analysisComplete", (data) => {
     console.log("✔️ Análisis completado. Costo total:", data.cost);

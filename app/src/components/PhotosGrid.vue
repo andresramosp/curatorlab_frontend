@@ -50,7 +50,7 @@
     <PhotoDuplicatesDialog
       v-model="showDuplicatesDialog"
       :photos="duplicatePhotos"
-      @delete="deletePhoto"
+      @deleteDuplicates="deleteDuplicates"
     />
   </div>
 </template>
@@ -87,9 +87,18 @@ function needProcess(photo) {
   );
 }
 
+async function deleteDuplicates(photoIds) {
+  await photosStore.deleteDuplicates(photoIds);
+  await photosStore.getOrFetch(true);
+  await photosStore.checkDuplicates();
+  showDuplicatesDialog.value = false;
+}
+
 async function deletePhoto(photoId) {
   await photosStore.deletePhoto(photoId);
-  console.log("Delete photo", photoId);
+  await photosStore.getOrFetch(true);
+  await photosStore.checkDuplicates();
+  showDuplicatesDialog.value = false;
 }
 
 function editPhoto(photoId) {
@@ -109,9 +118,10 @@ function fallbackImage(photo) {
 }
 
 function openDuplicatesDialog(photo) {
-  duplicatePhotos.value = photosStore.photos.filter((p) =>
-    photo.duplicates.includes(p.id)
-  );
+  duplicatePhotos.value = [
+    photo,
+    ...photosStore.photos.filter((p) => photo.duplicates.includes(p.id)),
+  ];
   showDuplicatesDialog.value = true;
 }
 </script>

@@ -14,7 +14,12 @@
               icon
               size="x-small"
               class="delete-button"
-              @click="$emit('delete', photo.id)"
+              @click="
+                $emit(
+                  'deleteDuplicates',
+                  photos.map((p) => p.id)
+                )
+              "
             >
               <v-icon>mdi-delete</v-icon>
             </v-btn>
@@ -35,7 +40,7 @@ const props = defineProps({
   photos: Array,
   modelValue: Boolean,
 });
-const emit = defineEmits(["update:modelValue", "delete"]);
+const emit = defineEmits(["update:modelValue", "deleteDuplicates"]);
 
 // 🔁 Variable local vinculada a modelValue
 const internalDialog = ref(props.modelValue);
