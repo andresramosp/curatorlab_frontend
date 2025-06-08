@@ -356,7 +356,8 @@ const handleAddPhotosToCanvas = async (event) => {
     toolbarState.value.photoOptions.count,
     basePosition,
     toolbarState.value.expansion.opposite,
-    toolbarState.value.expansion.inverted
+    toolbarState.value.expansion.inverted,
+    true
   );
 
   if (

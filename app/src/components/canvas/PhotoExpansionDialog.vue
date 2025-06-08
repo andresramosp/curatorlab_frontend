@@ -2,11 +2,12 @@
   <v-dialog v-model="dialog" max-width="900" height="700">
     <v-card style="display: flex; flex-direction: column; height: 700px">
       <!-- Header fijo -->
-      <div class="px-6 pt-4">
+      <div class="px-6 pt-4 pb-3" style="position: relative">
         <h2 class="text-h6 font-weight-bold mb-1">Suggested related photos</h2>
         <p class="text-subtitle-2 text-grey-darken-1 mb-2">
           Expansion type: {{ expansionLabel }}
         </p>
+        <v-img :src="photo.src" cover width="110" class="original-img" />
       </div>
 
       <!-- Contenedor con scroll -->
@@ -24,7 +25,7 @@
             <v-card
               v-for="generated in visiblePhotos"
               :key="generated.id"
-              style="width: 200px"
+              style="width: 200px; position: relative"
             >
               <v-img
                 :src="generated.thumbnailUrl"
@@ -33,8 +34,10 @@
                 }"
                 width="250"
                 @click="toggleSelection(generated.id)"
-                cover
               />
+              <div class="match-score">
+                {{ Math.round((generated.score ?? 0) * 100) }}%
+              </div>
             </v-card>
           </div>
 
@@ -179,5 +182,22 @@ watch(
 .selected-photo {
   border: 3px solid rgb(var(--v-theme-secondary));
   border-radius: 4px;
+}
+.original-img {
+  position: absolute;
+  top: 20px;
+  right: 36px;
+  border: 1px solid gray;
+}
+.match-score {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background-color: rgba(0, 0, 0, 0.65);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
 }
 </style>
