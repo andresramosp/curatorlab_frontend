@@ -130,7 +130,7 @@
               />
               <!-- Spinner de carga -->
               <v-group
-                v-if="photo.loading"
+                v-if="photo.loading && toolbarState.expansion.onCanvas"
                 :config="{
                   x: photo.config.width / 2,
                   y: photo.config.height / 2,
