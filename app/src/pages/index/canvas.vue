@@ -1,13 +1,25 @@
 <template>
   <div class="canvas-container">
     <!-- Toolbar vertical a la derecha -->
-    <div class="toolbar">
+    <div class="toolbar" :class="{ collapsed: isToolbarCollapsed }">
       <CanvasToolbar
+        v-if="!isToolbarCollapsed"
         v-model="toolbarState"
         @clearCanvas="handleClearCanvas"
         @openDialog="dialogVisible = true"
       />
+      <v-btn
+        icon
+        size="small"
+        class="toggle-toolbar-btn"
+        @click="isToolbarCollapsed = !isToolbarCollapsed"
+      >
+        <v-icon>
+          {{ isToolbarCollapsed ? "mdi-chevron-right" : "mdi-chevron-left" }}
+        </v-icon>
+      </v-btn>
     </div>
+
     <div ref="containerRef" class="canvas-wrapper">
       <!-- Floating Controls -->
       <div class="floating-controls">
@@ -203,6 +215,13 @@
       :isTrash="true"
       @add-photos="handleAddPhotos"
     />
+    <PhotoExpansionDialog
+      v-if="selectedPhotoDialog"
+      v-model="dialogExpansionVisible"
+      :photo="selectedPhotoDialog"
+      :toolbar-state="toolbarState"
+      @add-photos-expanded="handleAddPhotosExpanded"
+    />
     <div
       @click="dialogTrashVisible = true"
       :class="['trash-zone', { hovering: isHoveringTrash }]"
@@ -233,10 +252,13 @@ import CanvasToolbar from "@/components/canvas/CanvasToolbar.vue";
 import PhotoDialogCanvas from "@/components/canvas/PhotoDialogCanvas.vue";
 import { usePhotosStore } from "@/stores/photos";
 import Konva from "konva";
+import PhotoExpansionDialog from "@/components/canvas/PhotoExpansionDialog.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
 const { photos } = storeToRefs(canvasStore);
+
+const isToolbarCollapsed = ref(false);
 
 const toolbarState = ref({
   mouseMode: "move",
@@ -245,7 +267,8 @@ const toolbarState = ref({
     type: { criteria: "embedding" },
     inverted: false,
     opposite: false,
-    autoAlign: true,
+    autoAlign: false,
+    onCanvas: false,
   },
   photoOptions: {
     count: 1,
@@ -262,6 +285,8 @@ const setPhotoRef = (id) => (el) => {
 };
 const dialogVisible = ref(false);
 const dialogTrashVisible = ref(false);
+const dialogExpansionVisible = ref(false);
+const selectedPhotoDialog = ref(null);
 
 const theme = useTheme();
 const secondaryColor = theme.current.value.colors.secondary;
@@ -301,6 +326,17 @@ const dynamicSizeFactor = computed(() => {
 });
 
 const handleAddPhotoFromPhoto = async (event) => {
+  if (toolbarState.value.expansion.onCanvas) {
+    handleAddPhotosToCanvas(event);
+  } else {
+    const { photo } = event;
+    event.cancelBubble = true;
+    selectedPhotoDialog.value = photo;
+    dialogExpansionVisible.value = true;
+  }
+};
+
+const handleAddPhotosToCanvas = async (event) => {
   const { photo, position } = event;
   event.cancelBubble = true;
   const basePosition = { x: photo.config.x, y: photo.config.y };
@@ -441,9 +477,17 @@ async function handleAddPhotos(photoIds) {
   const photosToAdd = photoIds
     .map((id) => photosStore.photos.find((p) => p.id == id))
     .filter(Boolean);
-  debugger;
   canvasStore.addPhotos(photosToAdd);
   fitStageToPhotos();
+}
+
+async function handleAddPhotosExpanded(photosToAdd, position = "right") {
+  const basePosition = {
+    x: selectedPhotoDialog.value.config.x,
+    y: selectedPhotoDialog.value.config.y,
+  };
+  canvasStore.addPhotos(photosToAdd, true);
+  animatePhotoGroupExplosion(photoRefs, photos, basePosition, position);
 }
 
 function zoomTick(direction = 1) {
@@ -560,5 +604,34 @@ watch(
   min-width: 36px;
   height: 36px;
   color: rgba(255, 255, 255, 0.7);
+}
+
+.toolbar {
+  transition: width 0.3s ease;
+  position: relative;
+
+  &.collapsed {
+    width: 30px !important;
+
+    .canvas-toolbar {
+      display: none;
+    }
+
+    .toggle-toolbar-btn {
+      position: absolute;
+      top: 5px;
+      left: 0;
+      z-index: 5;
+    }
+  }
+
+  .toggle-toolbar-btn {
+    position: absolute;
+    top: 5px;
+    right: -15px;
+    z-index: 5;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+  }
 }
 </style>

@@ -41,12 +41,11 @@ export const useCanvasStore = defineStore("canvas", {
     currentZIndex: 1,
   }),
   actions: {
-    addPhotos(photoObjects) {
+    addPhotos(photoObjects, fromPhoto = false) {
       photoObjects.forEach((photo, index) => {
         if (!this.photos.some((p) => p.id == photo.id)) {
-          debugger;
           this.photos.push(
-            createPhoto(photo, undefined, false, this.currentZIndex, index)
+            createPhoto(photo, undefined, fromPhoto, this.currentZIndex, index)
           );
         }
       });
@@ -59,7 +58,8 @@ export const useCanvasStore = defineStore("canvas", {
       resultLength,
       basePosition,
       opposite,
-      inverted
+      inverted,
+      onCanvas
     ) {
       let basePhoto = basePhotos[0]; // de momento solo un anchor
       try {
@@ -106,13 +106,23 @@ export const useCanvasStore = defineStore("canvas", {
         const backendPhotos = Array.isArray(response.data)
           ? response.data
           : [response.data];
-        backendPhotos.forEach((backendPhoto) => {
-          if (!this.photos.some((photo) => photo.id === backendPhoto.id)) {
-            this.photos.push(
-              createPhoto(backendPhoto, basePosition, true, this.currentZIndex)
-            );
-          }
-        });
+
+        if (onCanvas) {
+          backendPhotos.forEach((backendPhoto) => {
+            if (!this.photos.some((photo) => photo.id === backendPhoto.id)) {
+              this.photos.push(
+                createPhoto(
+                  backendPhoto,
+                  basePosition,
+                  true,
+                  this.currentZIndex
+                )
+              );
+            }
+          });
+        } else {
+          return backendPhotos;
+        }
       } catch (error) {
         console.error("Error al añadir fotos similares:", error);
       } finally {
