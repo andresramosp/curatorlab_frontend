@@ -6,41 +6,51 @@
     color="surface"
   >
     <div class="header">
-      <span class="title">Suggested related photos</span>
-      <span class="expansion-type">({{ expansionLabel }})</span>
-      <v-btn icon @click="close" class="close-btn">
+      <div class="title-group">
+        <span class="title">Related photos</span>
+      </div>
+      <v-btn icon size="small" class="close-btn" @click="close">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
 
     <div class="photos-container" ref="scrollContainer" @scroll="handleScroll">
-      <div class="photo-wrapper" v-for="photo in visiblePhotos" :key="photo.id">
-        <v-img
-          draggable="true"
-          @dragstart="(e) => onDragStart(e, photo)"
-          :src="photo.thumbnailUrl"
-          :class="{ selected: selectedIds.includes(photo.id) }"
-          class="photo"
-          width="140"
-          height="90"
-          @click="toggleSelection(photo.id)"
-        />
-        <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
-      </div>
-      <v-progress-circular
-        v-if="isLoading"
-        indeterminate
-        size="28"
-        color="primary"
-        class="loading-spinner"
-      />
+      <template v-if="isLoading">
+        <div class="loading-wrapper">
+          <v-progress-circular indeterminate size="28" color="primary" />
+        </div>
+      </template>
+      <template v-else>
+        <div
+          class="photo-wrapper"
+          v-for="photo in visiblePhotos"
+          :key="photo.id"
+        >
+          <v-img
+            draggable="true"
+            @dragstart="(e) => onDragStart(e, photo)"
+            :src="photo.thumbnailUrl"
+            :class="{ selected: selectedIds.includes(photo.id) }"
+            class="photo"
+            width="140"
+            height="90"
+            @click="toggleSelection(photo.id)"
+          />
+          <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
+        </div>
+      </template>
     </div>
 
     <div class="actions">
-      <v-btn size="small" text @click="close">Close</v-btn>
-      <v-btn size="small" color="primary" @click="confirmSelection"
-        >Add to Canvas</v-btn
+      <v-btn
+        size="small"
+        variant="outlined"
+        color="primary"
+        style="height: 20px; font-size: 11px"
+        @click="confirmSelection"
       >
+        Add to Canvas
+      </v-btn>
     </div>
   </v-sheet>
 </template>
@@ -133,7 +143,7 @@ function confirmSelection() {
 }
 
 watch(
-  () => [props.toolbarOpen, props.photo],
+  () => [props.toolbarOpen, props.photo, props.toolbarState.expansion.type],
   async ([open, photo]) => {
     if (!open || !photo) return;
     isLoading.value = true;
@@ -157,10 +167,6 @@ watch(
 
 <style scoped>
 .expansion-toolbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
   padding: 8px 20px;
   background-color: #1e1e1e;
   border-top: 1px solid #333;
@@ -173,9 +179,14 @@ watch(
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   color: white;
   font-size: 14px;
+}
+
+.title-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .title {
@@ -184,6 +195,8 @@ watch(
 
 .expansion-type {
   color: #aaa;
+  font-size: 12px;
+  margin-top: 2px;
 }
 
 .photos-container {
@@ -231,5 +244,11 @@ watch(
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+.close-btn {
+  margin-left: auto;
+  color: white;
+  font-size: 10px;
 }
 </style>

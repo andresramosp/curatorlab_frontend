@@ -8,6 +8,7 @@
         @clearCanvas="handleClearCanvas"
         @openDialog="dialogVisible = true"
       />
+
       <v-btn
         icon
         size="small"
@@ -18,6 +19,17 @@
           {{ isToolbarCollapsed ? "mdi-chevron-right" : "mdi-chevron-left" }}
         </v-icon>
       </v-btn>
+    </div>
+
+    <div class="toolbar-expansion">
+      <PhotoExpansionToolbar
+        v-if="selectedPhotoForToolbar"
+        :photo="selectedPhotoForToolbar"
+        :toolbar-state="toolbarState"
+        :toolbar-open="isToolbarExpansionVisible"
+        @update:toolbarOpen="isToolbarExpansionVisible = $event"
+        @add-photos-expanded="handleAddPhotosExpanded"
+      />
     </div>
 
     <div
@@ -220,14 +232,6 @@
       :isTrash="true"
       @add-photos="handleAddPhotos"
     />
-    <PhotoExpansionToolbar
-      v-if="selectedPhotoForToolbar"
-      :photo="selectedPhotoForToolbar"
-      :toolbar-state="toolbarState"
-      :toolbar-open="isToolbarExpansionVisible"
-      @update:toolbarOpen="isToolbarExpansionVisible = $event"
-      @add-photos-expanded="handleAddPhotosExpanded"
-    />
 
     <div
       @click="dialogTrashVisible = true"
@@ -260,6 +264,7 @@ import PhotoDialogCanvas from "@/components/canvas/PhotoDialogCanvas.vue";
 import { usePhotosStore } from "@/stores/photos";
 import Konva from "konva";
 import PhotoExpansionDialog from "@/components/canvas/PhotoExpansionDialog.vue";
+import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
@@ -586,6 +591,13 @@ watch(
   display: flex;
   width: v-bind(TOOLBAR_WIDTH + "px");
   flex-shrink: 0;
+}
+.expansion-toolbar {
+  position: fixed;
+  bottom: 0px;
+  z-index: 1000;
+  right: 0px;
+  width: 1616px;
 }
 .canvas-wrapper {
   flex-grow: 1;
