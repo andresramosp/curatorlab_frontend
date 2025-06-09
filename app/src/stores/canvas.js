@@ -11,20 +11,27 @@ function createPhoto(
   currentZIndex,
   index = 0
 ) {
+  const hasCustomConfig = backendPhoto.config?.x != null;
+
   return {
     id: backendPhoto.id,
     src: backendPhoto.thumbnailUrl,
-    // src: `${
-    //   import.meta.env.VITE_API_BASE_URL
-    // }/uploads/photos/boxes/structure_mlsd_${backendPhoto.id}.png`,
-    config: {
-      x: basePosition.x + (index * PHOTO_WIDTH * 1) / 2,
-      y: basePosition.y + (index * PHOTO_HEIGHT * 1) / 2,
-      width: PHOTO_WIDTH,
-      height: PHOTO_HEIGHT,
-      opacity: fromPhoto ? 0 : 1,
-      zIndex: currentZIndex,
-    },
+    config: hasCustomConfig
+      ? {
+          ...backendPhoto.config,
+          zIndex: currentZIndex,
+          width: PHOTO_WIDTH,
+          height: PHOTO_HEIGHT,
+          opacity: fromPhoto ? 0 : 1,
+        }
+      : {
+          x: basePosition.x + (index * PHOTO_WIDTH * 1) / 2,
+          y: basePosition.y + (index * PHOTO_HEIGHT * 1) / 2,
+          width: PHOTO_WIDTH,
+          height: PHOTO_HEIGHT,
+          opacity: fromPhoto ? 0 : 1,
+          zIndex: currentZIndex,
+        },
     image: null,
     selected: false,
     showButton: false,

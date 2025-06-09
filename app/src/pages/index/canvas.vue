@@ -20,7 +20,12 @@
       </v-btn>
     </div>
 
-    <div ref="containerRef" class="canvas-wrapper">
+    <div
+      ref="containerRef"
+      class="canvas-wrapper"
+      @dragover.prevent
+      @drop="handlePhotoDrop"
+    >
       <!-- Floating Controls -->
       <div class="floating-controls">
         <v-btn @click="zoomTick(1)" icon size="small" class="outline">
@@ -215,13 +220,15 @@
       :isTrash="true"
       @add-photos="handleAddPhotos"
     />
-    <PhotoExpansionDialog
-      v-if="selectedPhotoDialog"
-      v-model="dialogExpansionVisible"
-      :photo="selectedPhotoDialog"
+    <PhotoExpansionToolbar
+      v-if="selectedPhotoForToolbar"
+      :photo="selectedPhotoForToolbar"
       :toolbar-state="toolbarState"
+      :toolbar-open="isToolbarExpansionVisible"
+      @update:toolbarOpen="isToolbarExpansionVisible = $event"
       @add-photos-expanded="handleAddPhotosExpanded"
     />
+
     <div
       @click="dialogTrashVisible = true"
       :class="['trash-zone', { hovering: isHoveringTrash }]"
@@ -325,16 +332,27 @@ const dynamicSizeFactor = computed(() => {
   return Math.min(Math.max(newFactor, 1), 5);
 });
 
-const handleAddPhotoFromPhoto = async (event) => {
+const isToolbarExpansionVisible = ref(false);
+const selectedPhotoForToolbar = ref(null);
+
+function handleAddPhotoFromPhoto(event) {
   if (toolbarState.value.expansion.onCanvas) {
     handleAddPhotosToCanvas(event);
   } else {
-    const { photo } = event;
     event.cancelBubble = true;
-    selectedPhotoDialog.value = photo;
-    dialogExpansionVisible.value = true;
+    selectedPhotoForToolbar.value = event.photo;
+    isToolbarExpansionVisible.value = true;
   }
-};
+}
+
+function handleAddPhotosExpanded(photosToAdd, position = "right") {
+  const basePosition = {
+    x: selectedPhotoForToolbar.value.config.x,
+    y: selectedPhotoForToolbar.value.config.y,
+  };
+  canvasStore.addPhotos(photosToAdd, true);
+  animatePhotoGroupExplosion(photoRefs, photos, basePosition, position);
+}
 
 const handleAddPhotosToCanvas = async (event) => {
   const { photo, position } = event;
@@ -377,6 +395,37 @@ const handleAddPhotosToCanvas = async (event) => {
     animatePhotoGroupExplosion(photoRefs, photos, basePosition, position);
   }
 };
+
+function handlePhotoDrop(event) {
+  event.preventDefault();
+
+  const raw = event.dataTransfer.getData("application/json");
+  if (!raw) return;
+
+  const droppedPhoto = JSON.parse(raw);
+  if (!droppedPhoto?.id) return;
+
+  const stage = stageRef.value.getStage();
+  const containerRect = stage.container().getBoundingClientRect();
+
+  // Coordenadas del puntero relativas al DOM del canvas
+  const pointer = {
+    x: event.clientX - containerRect.left,
+    y: event.clientY - containerRect.top,
+  };
+
+  // Convertir esas coordenadas al sistema interno del stage (con zoom y offset aplicados)
+  const transform = stage.getAbsoluteTransform().copy().invert();
+  const stagePoint = transform.point(pointer);
+
+  // Añadir la foto en la posición real
+  droppedPhoto.config = {
+    x: stagePoint.x,
+    y: stagePoint.y,
+  };
+
+  canvasStore.addPhotos([droppedPhoto]);
+}
 
 const getPhotoStrokeColor = (photo) => {
   if (photo.inTrash) return "rgba(250, 11, 11, 0.5)";
@@ -480,15 +529,6 @@ async function handleAddPhotos(photoIds) {
     .filter(Boolean);
   canvasStore.addPhotos(photosToAdd);
   fitStageToPhotos();
-}
-
-async function handleAddPhotosExpanded(photosToAdd, position = "right") {
-  const basePosition = {
-    x: selectedPhotoDialog.value.config.x,
-    y: selectedPhotoDialog.value.config.y,
-  };
-  canvasStore.addPhotos(photosToAdd, true);
-  animatePhotoGroupExplosion(photoRefs, photos, basePosition, position);
 }
 
 function zoomTick(direction = 1) {
