@@ -6,39 +6,43 @@
     color="surface"
   >
     <div class="header">
-      <div class="title-group">
+      <!-- <div class="title-group">
         <span class="title">Related photos</span>
-      </div>
+      </div> -->
       <v-btn icon size="small" class="close-btn" @click="close">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
 
     <div class="photos-container" ref="scrollContainer" @scroll="handleScroll">
-      <template v-if="isLoading">
-        <div class="loading-wrapper">
-          <v-progress-circular indeterminate size="28" color="primary" />
-        </div>
-      </template>
-      <template v-else>
-        <div
-          class="photo-wrapper"
-          v-for="photo in visiblePhotos"
-          :key="photo.id"
-        >
-          <v-img
-            draggable="true"
-            @dragstart="(e) => onDragStart(e, photo)"
-            :src="photo.thumbnailUrl"
-            :class="{ selected: selectedIds.includes(photo.id) }"
-            class="photo"
-            width="140"
-            height="90"
-            @click="toggleSelection(photo.id)"
-          />
-          <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
-        </div>
-      </template>
+      <div class="original-photo">
+        <v-img :src="photo.src" class="original" width="170" cover />
+      </div>
+      <div class="related-photos">
+        <template v-if="isLoading">
+          <div class="loading-wrapper">
+            <v-progress-circular indeterminate size="28" color="primary" />
+          </div>
+        </template>
+        <template v-else>
+          <div
+            class="photo-wrapper"
+            v-for="photo in visiblePhotos"
+            :key="photo.id"
+          >
+            <v-img
+              draggable="true"
+              @dragstart="(e) => onDragStart(e, photo)"
+              :src="photo.thumbnailUrl"
+              :class="{ selected: selectedIds.includes(photo.id) }"
+              class="photo"
+              width="170"
+              @click="toggleSelection(photo.id)"
+            />
+            <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
+          </div>
+        </template>
+      </div>
     </div>
 
     <div class="actions">
@@ -173,7 +177,6 @@ watch(
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .header {
@@ -250,5 +253,42 @@ watch(
   margin-left: auto;
   color: white;
   font-size: 10px;
+}
+
+.photos-container {
+  display: flex;
+  overflow-x: hidden;
+  padding: 4px 0;
+  gap: 12px;
+}
+
+.original-photo {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 12px;
+  position: sticky;
+  left: 0;
+  background: #1e1e1e;
+  z-index: 1;
+}
+
+.original-photo .original {
+  border: 2px solid rgb(var(--v-theme-secondary));
+}
+
+.original-photo .label {
+  margin-top: 4px;
+  color: #aaa;
+  font-size: 11px;
+}
+
+.related-photos {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  flex: 1;
+  scrollbar-width: none;
 }
 </style>

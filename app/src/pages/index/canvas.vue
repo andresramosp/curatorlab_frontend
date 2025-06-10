@@ -1,25 +1,6 @@
 <template>
   <div class="canvas-container">
     <!-- Toolbar vertical a la derecha -->
-    <div class="toolbar" :class="{ collapsed: isToolbarCollapsed }">
-      <CanvasToolbar
-        v-if="!isToolbarCollapsed"
-        v-model="toolbarState"
-        @clearCanvas="handleClearCanvas"
-        @openDialog="dialogVisible = true"
-      />
-
-      <v-btn
-        icon
-        size="small"
-        class="toggle-toolbar-btn"
-        @click="isToolbarCollapsed = !isToolbarCollapsed"
-      >
-        <v-icon>
-          {{ isToolbarCollapsed ? "mdi-chevron-right" : "mdi-chevron-left" }}
-        </v-icon>
-      </v-btn>
-    </div>
 
     <div class="toolbar-expansion">
       <PhotoExpansionToolbar
@@ -39,7 +20,52 @@
       @drop="handlePhotoDrop"
     >
       <!-- Floating Controls -->
-      <div class="floating-controls">
+      <div class="floating-controls-source">
+        <v-tooltip text="Import from catalog" location="bottom">
+          <template #activator="{ props }">
+            <v-btn
+              icon
+              @click="dialogVisible = true"
+              size="small"
+              class="mx-auto"
+              v-bind="props"
+            >
+              <v-icon size="20">mdi-folder</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Clear canvas" location="bottom">
+          <template #activator="{ props }">
+            <v-btn
+              icon
+              @click="handleClearCanvas"
+              size="small"
+              class="mx-auto"
+              v-bind="props"
+            >
+              <v-icon size="22">mdi-delete-sweep</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+
+        <v-tooltip text="Additional settings" location="bottom">
+          <template #activator="{ props }">
+            <v-btn
+              icon
+              @click="() => {}"
+              size="small"
+              class="mx-auto"
+              v-bind="props"
+            >
+              <v-icon size="22">mdi-cog</v-icon>
+            </v-btn>
+          </template>
+        </v-tooltip>
+      </div>
+
+      <!-- Floating Controls -->
+      <div class="floating-controls-canvas">
         <v-btn @click="zoomTick(1)" icon size="small" class="outline">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -205,6 +231,7 @@
                     toolbarState.photoOptions.spreadMode === 'circular'
                   "
                   v-if="
+                    toolbarState.expansion.onCanvas &&
                     !photo.inTrash &&
                     photo.hovered &&
                     (toolbarState.expansion.type.criteria !== 'tags' ||
@@ -214,6 +241,14 @@
                   "
                   @click="handleAddPhotoFromPhoto"
                   :sizeFactor="dynamicSizeFactor"
+                />
+                <PhotoCenterButton
+                  v-else-if="!photo.inTrash && photo.hovered"
+                  :photo="photo"
+                  :fill="secondaryColor"
+                  icon="+"
+                  @click="handleAddPhotoFromPhoto"
+                  :sizeFactor="1.5"
                 />
               </template>
             </v-group>
@@ -257,20 +292,19 @@ import { useTheme } from "vuetify";
 import { storeToRefs } from "pinia";
 import { useCanvasStore } from "@/stores/canvas";
 import TagPillsCanvas from "@/components/canvas/TagPills/TagPillsCanvas.vue";
-import ExpandPhotoButtons from "@/components/canvas/ExpandPhotoButtons.vue";
-import PhotoDetectionAreas from "@/components/canvas/PhotoDetectionAreas.vue";
+import ExpandPhotoButtons from "@/components/canvas/PhotoControls/ExpandPhotoButtons.vue";
+import PhotoDetectionAreas from "@/components/canvas/PhotoControls/PhotoDetectionAreas.vue";
 import CanvasToolbar from "@/components/canvas/CanvasToolbar.vue";
 import PhotoDialogCanvas from "@/components/canvas/PhotoDialogCanvas.vue";
 import { usePhotosStore } from "@/stores/photos";
 import Konva from "konva";
 import PhotoExpansionDialog from "@/components/canvas/PhotoExpansionDialog.vue";
 import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar.vue";
+import PhotoCenterButton from "@/components/canvas/PhotoControls/PhotoCenterButton.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
 const { photos } = storeToRefs(canvasStore);
-
-const isToolbarCollapsed = ref(false);
 
 const toolbarState = ref({
   mouseMode: "move",
@@ -592,12 +626,11 @@ watch(
   width: v-bind(TOOLBAR_WIDTH + "px");
   flex-shrink: 0;
 }
-.expansion-toolbar {
-  position: fixed;
+.toolbar-expansion {
+  position: absolute;
   bottom: 0px;
   z-index: 1000;
-  right: 0px;
-  width: 1616px;
+  width: 1615px;
 }
 .canvas-wrapper {
   flex-grow: 1;
@@ -641,12 +674,24 @@ watch(
     border-color 0.2s ease;
 }
 
-.floating-controls {
+.floating-controls-canvas {
   position: absolute;
   top: 5px;
   right: 5px;
   display: flex;
   flex-direction: column;
+  gap: 7px;
+  z-index: 300;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.floating-controls-source {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  display: flex;
+  flex-direction: row;
   gap: 7px;
   z-index: 300;
   border-radius: 8px;
