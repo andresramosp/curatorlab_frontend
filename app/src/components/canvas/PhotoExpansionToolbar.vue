@@ -75,7 +75,7 @@ const generatedPhotos = ref([]);
 const visiblePhotos = ref([]);
 const selectedIds = ref([]);
 const isLoading = ref(false);
-const pageSize = 24;
+const pageSize = 50;
 const chunkSize = 6;
 
 const scrollContainer = ref(null);
