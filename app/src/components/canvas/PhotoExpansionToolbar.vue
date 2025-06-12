@@ -6,14 +6,26 @@
     color="surface"
   >
     <div class="header">
-      <!-- <div class="title-group">
-        <span class="title">Related photos</span>
-      </div> -->
+      <SelectMini
+        v-model="toolbarState.expansion.type"
+        :items="[
+          { label: 'General', value: { criteria: 'embedding' } },
+          {
+            label: 'Context',
+            value: { criteria: 'semantic', fields: ['context'] },
+          },
+          {
+            label: 'Story',
+            value: { criteria: 'semantic', fields: ['story'] },
+          },
+          { label: 'Tags', value: { criteria: 'tags' } },
+          { label: 'Composition', value: { criteria: 'composition' } },
+        ]"
+      />
       <v-btn icon size="small" class="close-btn" @click="close">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
-
     <div class="photos-container" ref="scrollContainer" @scroll="handleScroll">
       <div class="original-photo">
         <v-img :src="photo.src" class="original" width="170" cover />
@@ -44,24 +56,13 @@
         </template>
       </div>
     </div>
-
-    <div class="actions">
-      <v-btn
-        size="small"
-        variant="outlined"
-        color="primary"
-        style="height: 20px; font-size: 11px"
-        @click="confirmSelection"
-      >
-        Add to Canvas
-      </v-btn>
-    </div>
   </v-sheet>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from "vue";
+import { ref, watch, nextTick } from "vue";
 import { useCanvasStore } from "@/stores/canvas";
+import SelectMini from "../wrappers/SelectMini.vue";
 
 const props = defineProps({
   photo: Object,
@@ -79,23 +80,6 @@ const pageSize = 100;
 const chunkSize = 6;
 
 const scrollContainer = ref(null);
-
-const expansionLabel = computed(() => {
-  const criteria = props.toolbarState?.expansion?.type.criteria;
-  const map = {
-    embedding: "General",
-    semantic_context: "Context",
-    semantic_story: "Story",
-    tags: "Tags",
-    composition: "Composition",
-  };
-  if (!criteria) return "Unknown";
-  if (criteria === "semantic") {
-    const fields = props.toolbarState?.expansion?.fields?.[0];
-    return map[`semantic_${fields}`] || "Semantic";
-  }
-  return map[criteria] || "Unknown";
-});
 
 function onDragStart(ev, photo) {
   const data = JSON.stringify(photo);
@@ -171,18 +155,21 @@ watch(
 
 <style scoped>
 .expansion-toolbar {
-  padding: 8px 20px;
   background-color: #1e1e1e;
   border-top: 1px solid #333;
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 5px;
+  padding-top: 5px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   color: white;
   font-size: 14px;
 }
@@ -204,6 +191,7 @@ watch(
 
 .photos-container {
   display: flex;
+  align-items: center;
   overflow-x: auto;
   gap: 12px;
   padding: 4px 0;
@@ -216,7 +204,6 @@ watch(
 }
 
 .photo {
-  border-radius: 6px;
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -224,7 +211,7 @@ watch(
   transform: scale(1.05);
 }
 .selected {
-  outline: 3px solid #7c4dff;
+  outline: 3px solid rgb(var(--v-theme-accent));
 }
 
 .score {
@@ -253,6 +240,8 @@ watch(
   margin-left: auto;
   color: white;
   font-size: 10px;
+  width: 25px;
+  height: 25px;
 }
 
 .photos-container {
@@ -289,6 +278,7 @@ watch(
   overflow-x: auto;
   gap: 12px;
   flex: 1;
+  padding: 5px;
   scrollbar-width: none;
 }
 </style>
