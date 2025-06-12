@@ -444,31 +444,27 @@ function handlePhotoDrop(event) {
   const raw = event.dataTransfer.getData("application/json");
   if (!raw) return;
 
-  const droppedPhoto = JSON.parse(raw);
-  if (!droppedPhoto?.id) return;
+  const droppedPhotos = JSON.parse(raw);
+  if (!Array.isArray(droppedPhotos) || droppedPhotos.length === 0) return;
 
   const stage = stageRef.value.getStage();
   const containerRect = stage.container().getBoundingClientRect();
-
-  // Coordenadas del puntero relativas al DOM del canvas
-  const pointer = {
-    x: event.clientX - containerRect.left,
-    y: event.clientY - containerRect.top,
-  };
-
-  // Convertir esas coordenadas al sistema interno del stage (con zoom y offset aplicados)
   const transform = stage.getAbsoluteTransform().copy().invert();
-  const stagePoint = transform.point(pointer);
 
-  // Añadir la foto en la posición real
-  droppedPhoto.config = {
-    x: stagePoint.x,
-    y: stagePoint.y,
-  };
+  droppedPhotos.forEach((photo, index) => {
+    const offsetX = index * 30; // separación horizontal opcional
+    const offsetY = index * 30;
 
-  canvasStore.addPhotos([droppedPhoto]);
+    const pointer = {
+      x: event.clientX - containerRect.left + offsetX,
+      y: event.clientY - containerRect.top + offsetY,
+    };
 
-  expansionToolbar.value?.removePhotoFromList(droppedPhoto.id);
+    const stagePoint = transform.point(pointer);
+    photo.config = { x: stagePoint.x, y: stagePoint.y };
+    canvasStore.addPhotos([photo]);
+    expansionToolbar.value?.removePhotoFromList(photo.id);
+  });
 }
 
 const getPhotoStrokeColor = (photo) => {

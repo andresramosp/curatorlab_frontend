@@ -92,7 +92,12 @@ function removePhotoFromList(photoId) {
 defineExpose({ removePhotoFromList });
 
 function onDragStart(ev, photo) {
-  const data = JSON.stringify(photo);
+  const photosToDrag =
+    selectedIds.value.length > 0
+      ? generatedPhotos.value.filter((p) => selectedIds.value.includes(p.id))
+      : [photo];
+
+  const data = JSON.stringify(photosToDrag);
   ev.dataTransfer?.setData("application/json", data);
 }
 
