@@ -83,6 +83,14 @@ const chunkSize = 6;
 
 const scrollContainer = ref(null);
 
+function removePhotoFromList(photoId) {
+  generatedPhotos.value = generatedPhotos.value.filter((p) => p.id !== photoId);
+  visiblePhotos.value = visiblePhotos.value.filter((p) => p.id !== photoId);
+  selectedIds.value = selectedIds.value.filter((id) => id !== photoId);
+}
+
+defineExpose({ removePhotoFromList });
+
 function onDragStart(ev, photo) {
   const data = JSON.stringify(photo);
   ev.dataTransfer?.setData("application/json", data);

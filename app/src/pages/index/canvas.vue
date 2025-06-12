@@ -4,6 +4,7 @@
 
     <div class="toolbar-expansion">
       <PhotoExpansionToolbar
+        ref="expansionToolbar"
         v-if="selectedPhotoForToolbar"
         :photo="selectedPhotoForToolbar"
         :toolbar-state="toolbarState"
@@ -334,6 +335,8 @@ const dialogTrashVisible = ref(false);
 const dialogExpansionVisible = ref(false);
 const selectedPhotoDialog = ref(null);
 
+const expansionToolbar = ref(null);
+
 const theme = useTheme();
 const secondaryColor = theme.current.value.colors.secondary;
 const accentColor = theme.current.value.colors.accent;
@@ -464,6 +467,8 @@ function handlePhotoDrop(event) {
   };
 
   canvasStore.addPhotos([droppedPhoto]);
+
+  expansionToolbar.value?.removePhotoFromList(droppedPhoto.id);
 }
 
 const getPhotoStrokeColor = (photo) => {
