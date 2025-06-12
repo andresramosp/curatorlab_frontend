@@ -23,7 +23,7 @@
     >
       <!-- Floating Controls -->
       <div class="floating-controls-source">
-        <v-tooltip text="Import from catalog" location="bottom">
+        <v-tooltip text="Add photos to canvas" location="bottom">
           <template #activator="{ props }">
             <v-btn
               icon
@@ -32,7 +32,7 @@
               class="mx-auto"
               v-bind="props"
             >
-              <v-icon size="20">mdi-folder</v-icon>
+              <v-icon size="20">mdi-folder-plus</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
@@ -43,27 +43,46 @@
               icon
               @click="handleClearCanvas"
               size="small"
-              class="mx-auto"
+              class="mx-auto outline"
               v-bind="props"
             >
               <v-icon size="22">mdi-delete-sweep</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
-
-        <v-tooltip text="Additional settings" location="bottom">
+        <v-tooltip text="Settings" location="bottom">
           <template #activator="{ props }">
             <v-btn
               icon
               @click="() => {}"
               size="small"
-              class="mx-auto"
+              class="mx-auto outline"
               v-bind="props"
             >
               <v-icon size="22">mdi-cog</v-icon>
             </v-btn>
           </template>
         </v-tooltip>
+      </div>
+
+      <div class="floating-controls-explore">
+        <ToggleButtons v-model="toolbarState.expansion.onCanvas">
+          <ToggleOption
+            :value="false"
+            size="small"
+            tooltip="Find related images from a dedicated dialog"
+          >
+            <v-icon left class="mr-1">mdi-folder-outline</v-icon>
+            Explore on catalog </ToggleOption
+          ><ToggleOption
+            :value="true"
+            size="small"
+            tooltip="Expand images directly on the canvas"
+          >
+            <v-icon left class="mr-1">mdi-palette-outline</v-icon>
+            Explore on canvas
+          </ToggleOption>
+        </ToggleButtons>
       </div>
 
       <!-- Floating Controls -->
@@ -247,10 +266,11 @@
                 <PhotoCenterButton
                   v-else-if="!photo.inTrash && photo.hovered"
                   :photo="photo"
-                  :fill="secondaryColor"
+                  :fill="accentColor"
                   icon="+"
+                  font-size="30"
                   @click="handleAddPhotoFromPhoto"
-                  :sizeFactor="1.5"
+                  :sizeFactor="1.6"
                 />
               </template>
             </v-group>
@@ -303,6 +323,8 @@ import Konva from "konva";
 import PhotoExpansionDialog from "@/components/canvas/PhotoExpansionDialog.vue";
 import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar.vue";
 import PhotoCenterButton from "@/components/canvas/PhotoControls/PhotoCenterButton.vue";
+import ToggleButtons from "@/components/wrappers/ToggleButtons.vue";
+import ToggleOption from "@/components/wrappers/ToggleOption.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
@@ -500,7 +522,7 @@ const fitStageToPhotos = () => {
   const containerWidth = stage.width() - TOOLBAR_WIDTH; // Restamos el ancho de la toolbar
   const containerHeight = stage.height();
   const margin = 40;
-  const extraPaddingRatio = 0.1; // 10% de padding
+  const extraPaddingRatio = 0.8; // 10% de padding
 
   // Bounding box de todas las fotos
   const bounds = photos.value.reduce(
@@ -686,6 +708,14 @@ watch(
   z-index: 300;
   border-radius: 8px;
   padding: 8px;
+}
+
+.floating-controls-explore {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
 }
 
 .floating-controls-source {

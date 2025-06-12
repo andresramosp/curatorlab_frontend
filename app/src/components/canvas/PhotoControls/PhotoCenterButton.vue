@@ -15,7 +15,7 @@
     <v-text
       :config="{
         x: -buttonRadius,
-        y: -buttonRadius,
+        y: -buttonRadius + 3,
         width: buttonRadius * 2,
         height: buttonRadius * 2,
         text: icon,

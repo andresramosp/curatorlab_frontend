@@ -14,6 +14,11 @@ export function useCanvasPhoto(stageRef, photos, photoRefs, stageConfig) {
   const handleSelectPhoto = (photo, event) => {
     if (!selectionRectVisible()) {
       photo.selected = !photo.selected;
+      const node = photoRefs.value[photo.id]?.getNode();
+      if (node) {
+        node.moveToTop();
+        node.getLayer().batchDraw();
+      }
     }
   };
 
