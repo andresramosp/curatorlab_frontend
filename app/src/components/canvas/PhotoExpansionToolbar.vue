@@ -26,34 +26,36 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </div>
-    <div class="photos-container" ref="scrollContainer" @scroll="handleScroll">
+    <div
+      class="photos-container"
+      ref="scrollContainer"
+      @scroll="handleScroll"
+      @wheel="onWheel"
+    >
       <div class="original-photo">
         <v-img :src="photo.src" class="original" width="170" cover />
+        <div v-if="isLoading" class="loading-wrapper">
+          <v-progress-circular indeterminate size="45" color="primary" />
+        </div>
       </div>
       <div class="related-photos">
-        <template v-if="isLoading">
-          <div class="loading-wrapper">
-            <v-progress-circular indeterminate size="28" color="primary" />
-          </div>
-        </template>
-        <template v-else>
-          <div
-            class="photo-wrapper"
-            v-for="photo in visiblePhotos"
-            :key="photo.id"
-          >
-            <v-img
-              draggable="true"
-              @dragstart="(e) => onDragStart(e, photo)"
-              :src="photo.thumbnailUrl"
-              :class="{ selected: selectedIds.includes(photo.id) }"
-              class="photo"
-              width="170"
-              @click="toggleSelection(photo.id)"
-            />
-            <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
-          </div>
-        </template>
+        <div
+          v-if="!isLoading"
+          class="photo-wrapper"
+          v-for="photo in visiblePhotos"
+          :key="photo.id"
+        >
+          <v-img
+            draggable="true"
+            @dragstart="(e) => onDragStart(e, photo)"
+            :src="photo.thumbnailUrl"
+            :class="{ selected: selectedIds.includes(photo.id) }"
+            class="photo"
+            width="170"
+            @click="toggleSelection(photo.id)"
+          />
+          <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
+        </div>
       </div>
     </div>
   </v-sheet>
@@ -122,14 +124,14 @@ function close() {
   emit("update:toolbarOpen", false);
 }
 
-function confirmSelection() {
-  const selected = generatedPhotos.value.filter((p) =>
-    selectedIds.value.includes(p.id)
-  );
-  emit("add-photos-expanded", selected);
-  close();
+function onWheel(e) {
+  // Si es más vertical que horizontal, convertimos a scroll horizontal
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    e.preventDefault();
+    scrollContainer.value.scrollLeft += e.deltaY;
+  }
+  // Si es horizontal (deltaX), lo dejamos pasar sin tocar nada
 }
-
 watch(
   () => [props.toolbarOpen, props.photo, props.toolbarState.expansion.type],
   async ([open, photo]) => {
@@ -191,11 +193,19 @@ watch(
 
 .photos-container {
   display: flex;
-  align-items: center;
-  overflow-x: auto;
+  align-items: baseline;
   gap: 12px;
   padding: 4px 0;
   scrollbar-width: none;
+  overflow: hidden;
+}
+
+.photos-container::-webkit-scrollbar {
+  height: 8px;
+}
+.photos-container::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.5);
+  border-radius: 4px;
 }
 
 .photo-wrapper {
@@ -225,11 +235,6 @@ watch(
   border-radius: 3px;
 }
 
-.loading-spinner {
-  align-self: center;
-  margin-left: 12px;
-}
-
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -244,29 +249,6 @@ watch(
   height: 25px;
 }
 
-.photos-container {
-  display: flex;
-  overflow-x: hidden;
-  padding: 4px 0;
-  gap: 12px;
-}
-
-.original-photo {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 12px;
-  position: sticky;
-  left: 0;
-  background: #1e1e1e;
-  z-index: 1;
-}
-
-.original-photo .original {
-  border: 2px solid rgb(var(--v-theme-secondary));
-}
-
 .original-photo .label {
   margin-top: 4px;
   color: #aaa;
@@ -276,9 +258,35 @@ watch(
 .related-photos {
   display: flex;
   overflow-x: auto;
+  overflow-y: hidden;
   gap: 12px;
   flex: 1;
   padding: 5px;
-  scrollbar-width: none;
+  /* scrollbar-width: none; */
+}
+
+.original-photo {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  left: 0;
+  background: #1e1e1e;
+  z-index: 1;
+  width: 170px;
+  height: auto;
+  margin-bottom: 18px;
+}
+
+.original-photo .original {
+  border: 2px solid rgb(var(--v-theme-secondary));
+}
+
+.loading-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
