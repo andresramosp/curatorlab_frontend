@@ -27,26 +27,29 @@ export function useCanvasPhoto(stageRef, photos, photoRefs, stageConfig) {
   const handleDragStart = (photo, e) => {
     e.cancelBubble = true;
 
-    const moveGroupToTop = (p) => {
-      const node = photoRefs.value[p.id]?.getNode();
-      if (node) node.moveToTop();
-    };
+    // 1) Lleva primero cualquier selección previa (opcional si solo arrastras uno)
+    photos.value
+      .filter((p) => p.selected && p.id !== photo.id)
+      .forEach((p) => photoRefs.value[p.id]?.getNode().moveToTop());
 
-    Object.keys(dragGroupStart).forEach((key) => delete dragGroupStart[key]);
+    // 2) Mueve el que estás arrastrando al top *al final* para que esté siempre por encima
+    const node = photoRefs.value[photo.id]?.getNode();
+    if (node) {
+      node.moveToTop();
+      node.getLayer().batchDraw();
+    }
 
+    // 3) Luego tu lógica de arrastre (almacenar posiciones, etc.)
+    Object.keys(dragGroupStart).forEach((k) => delete dragGroupStart[k]);
     if (photo.selected) {
       photos.value.forEach((p) => {
         if (p.selected) {
           dragGroupStart[p.id] = { x: p.config.x, y: p.config.y };
-          moveGroupToTop(p);
         }
       });
     } else {
       dragGroupStart[photo.id] = { x: photo.config.x, y: photo.config.y };
-      moveGroupToTop(photo);
     }
-
-    photoRefs.value[photo.id]?.getNode()?.getLayer()?.batchDraw();
   };
 
   const handleDragMove = (photo, e) => {

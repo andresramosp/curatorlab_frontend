@@ -70,17 +70,15 @@
           <ToggleOption
             :value="false"
             size="small"
-            tooltip="Find related images from a dedicated dialog"
+            tooltip="Explore related images in a scrollable feed"
           >
-            <v-icon left class="mr-1">mdi-folder-outline</v-icon>
-            Explore on catalog </ToggleOption
+            <v-icon size="20" left>mdi-playlist-plus</v-icon> </ToggleOption
           ><ToggleOption
             :value="true"
             size="small"
-            tooltip="Expand images directly on the canvas"
+            tooltip="Unleash up to 5 related images directly onto the canvas"
           >
-            <v-icon left class="mr-1">mdi-palette-outline</v-icon>
-            Explore on canvas
+            <v-icon size="20" left>mdi-palette-outline</v-icon>
           </ToggleOption>
         </ToggleButtons>
       </div>
@@ -162,12 +160,18 @@
               handleDragEnd(photo, $event, toolbarState.expansion.autoAlign)
             "
             @dragmove="handleDragMove(photo, $event)"
-            @click="handleSelectPhoto(photo, $event)"
+            @dblclick="handleSelectPhoto(photo, $event)"
           >
             <v-group
               :config="{}"
-              @mouseover="handleMouseOver(photo)"
-              @mouseout="handleMouseOut(photo)"
+              @mouseover="
+                handleMouseOver(photo);
+                stageRef.getStage().container().style.cursor = 'pointer';
+              "
+              @mouseout="
+                handleMouseOut(photo);
+                stageRef.getStage().container().style.cursor = '';
+              "
             >
               <!-- Área de hover con padding invisible -->
               <v-rect
@@ -617,6 +621,13 @@ onMounted(() => {
   orderPhotos();
   updateStageOffset();
 });
+
+watch(
+  () => toolbarState.value.expansion.onCanvas,
+  () => {
+    isToolbarExpansionVisible.value = false;
+  }
+);
 
 watch(
   () => photos.value.map((p) => p.src),
