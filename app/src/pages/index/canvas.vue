@@ -2,17 +2,18 @@
   <div class="canvas-container">
     <!-- Toolbar vertical a la derecha -->
 
-    <div class="toolbar-expansion">
-      <PhotoExpansionToolbar
-        ref="expansionToolbar"
-        v-if="selectedPhotoForToolbar"
-        :photo="selectedPhotoForToolbar"
-        :toolbar-state="toolbarState"
-        :toolbar-open="isToolbarExpansionVisible"
-        @update:toolbarOpen="isToolbarExpansionVisible = $event"
-        @add-photos-expanded="handleAddPhotosExpanded"
-      />
-    </div>
+    <transition name="slide-up-toolbar">
+      <div class="toolbar-expansion" v-if="isToolbarExpansionVisible">
+        <PhotoExpansionToolbar
+          ref="expansionToolbar"
+          :photo="selectedPhotoForToolbar"
+          :toolbar-state="toolbarState"
+          :toolbar-open="isToolbarExpansionVisible"
+          @update:toolbarOpen="isToolbarExpansionVisible = $event"
+          @add-photos-expanded="handleAddPhotosExpanded"
+        />
+      </div>
+    </transition>
 
     <div
       ref="containerRef"
@@ -732,5 +733,20 @@ watch(
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
   }
+}
+
+.slide-up-toolbar-enter-active,
+.slide-up-toolbar-leave-active {
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+.slide-up-toolbar-enter-from,
+.slide-up-toolbar-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+.slide-up-toolbar-enter-to,
+.slide-up-toolbar-leave-from {
+  transform: translateY(0%);
+  opacity: 1;
 }
 </style>
