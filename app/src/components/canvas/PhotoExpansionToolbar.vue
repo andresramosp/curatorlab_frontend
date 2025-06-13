@@ -34,6 +34,25 @@
     >
       <div class="original-photo">
         <v-img :src="photo.src" class="original" width="170" cover />
+        <!-- Overlay de tags sólo cuando el criterio sea 'tags' -->
+        <div
+          v-if="toolbarState.expansion.type.criteria === 'tags'"
+          class="tags-overlay"
+          ref="tagsOverlay"
+          @wheel.prevent="onTagsWheel"
+        >
+          <TagChip
+            v-for="tagPhoto in filteredTags"
+            :key="tagPhoto.tag.id"
+            :tag="tagPhoto.tag"
+            v-model="tagPhoto.tag.selected"
+            :selected-color="selectedColor"
+            :hover-color="hoverColor"
+            :default-color="defaultColor"
+            :text-color="textColor"
+            :pill-height="pillHeight"
+          />
+        </div>
         <div v-if="isLoading" class="loading-wrapper">
           <v-progress-circular indeterminate size="45" color="primary" />
         </div>
@@ -62,9 +81,11 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from "vue";
+import { ref, watch, nextTick, computed } from "vue";
 import { useCanvasStore } from "@/stores/canvas";
 import SelectMini from "../wrappers/SelectMini.vue";
+import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
+import TagChip from "../wrappers/TagChip.vue";
 
 const props = defineProps({
   photo: Object,
@@ -72,6 +93,15 @@ const props = defineProps({
   toolbarOpen: Boolean,
 });
 const emit = defineEmits(["update:toolbarOpen", "add-photos-expanded"]);
+
+const {
+  filteredTags,
+  selectedColor,
+  hoverColor,
+  defaultColor,
+  textColor,
+  pillHeight,
+} = useTagDisplay(() => props.photo.tags);
 
 const canvasStore = useCanvasStore();
 const generatedPhotos = ref([]);
@@ -82,6 +112,7 @@ const pageSize = 100;
 const chunkSize = 6;
 
 const scrollContainer = ref(null);
+const tagsOverlay = ref(null);
 
 function removePhotoFromList(photoId) {
   generatedPhotos.value = generatedPhotos.value.filter((p) => p.id !== photoId);
@@ -145,6 +176,17 @@ function onWheel(e) {
   }
   // Si es horizontal (deltaX), lo dejamos pasar sin tocar nada
 }
+
+function onTagsWheel(e) {
+  // mueve el scroll interno
+  tagsOverlay.value.scrollTop += e.deltaY;
+}
+
+// supongo que tienes ya algo así para marcar tags
+function toggleTag(tag) {
+  tag.selected = !tag.selected;
+}
+
 watch(
   () => [props.toolbarOpen, props.photo, props.toolbarState.expansion.type],
   async ([open, photo]) => {
@@ -283,7 +325,7 @@ watch(
   display: flex;
   justify-content: center;
   align-items: center;
-  position: sticky;
+  position: relative;
   left: 0;
   background: #1e1e1e;
   z-index: 1;
@@ -301,5 +343,29 @@ watch(
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.tags-overlay {
+  position: absolute;
+  top: 5px;
+  left: 8px;
+  right: 8px;
+  bottom: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0px;
+  overflow-y: auto;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  z-index: 2;
+}
+/* Scrollbar */
+.tags-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+.tags-overlay::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.5);
+  border-radius: 3px;
 }
 </style>

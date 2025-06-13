@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
 import { shortenTag } from "@/utils/utils";
 import { computed, ref } from "vue";
 import { useTheme } from "vuetify";
@@ -59,17 +60,14 @@ const isHovered = ref(false);
 
 const fontSize = 11;
 const textPadding = 2;
-const defaultColor = "gray";
-
-const theme = useTheme();
-const selectedColor = theme.current.value.colors.secondary;
-const textColor = theme.current.value.colors.primary;
+const { selectedColor, defaultColor, textColor, pillHeight } = useTagDisplay(
+  () => props.tags
+);
 
 const pillWidth = computed(() => {
   const approxWidth = shortenTag(props.tag.name).length * (fontSize * 0.5);
   return approxWidth + textPadding + 7;
 });
-const pillHeight = 18;
 
 const computedX = computed(() =>
   props.offsetX !== null

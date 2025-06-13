@@ -274,7 +274,7 @@
                   icon="+"
                   font-size="30"
                   @click="handleAddPhotoFromPhoto"
-                  :sizeFactor="1.6"
+                  :sizeFactor="1.3"
                 />
               </template>
             </v-group>

@@ -33,7 +33,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import TagPill from "./TagPill.vue";
-import { shortenTag } from "@/utils/utils";
+import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
 
 const props = defineProps({
   photo: { type: Object, required: true },
@@ -41,29 +41,7 @@ const props = defineProps({
   visible: { type: Boolean, required: true },
 });
 
-const allowedGroups = [
-  "person",
-  "animals",
-  "objects",
-  "environment",
-  "misc",
-  "toponym",
-  "mood",
-  "weather",
-  "symbols",
-];
-const filteredTags = computed(() => {
-  const seen = new Map();
-  for (const tagPhoto of props.tags) {
-    const id = tagPhoto.tag.id;
-    if (allowedGroups.includes(tagPhoto.tag.group) && !seen.has(id)) {
-      seen.set(id, tagPhoto);
-    }
-  }
-  return Array.from(seen.values()).sort(
-    (t1, t2) => shortenTag(t2.tag.name).length - shortenTag(t1.tag.name).length
-  );
-});
+const { filteredTags } = useTagDisplay(() => props.tags);
 
 const scrollOffset = ref(0);
 const itemHeight = 23;
