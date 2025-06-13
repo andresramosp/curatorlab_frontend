@@ -49,7 +49,7 @@
             :selected-color="selectedColor"
             :hover-color="hoverColor"
             :default-color="defaultColor"
-            :text-color="textColor"
+            :text-color="'white'"
             :pill-height="pillHeight"
           />
         </div>
@@ -86,6 +86,7 @@ import { useCanvasStore } from "@/stores/canvas";
 import SelectMini from "../wrappers/SelectMini.vue";
 import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
 import TagChip from "../wrappers/TagChip.vue";
+import { debounce } from "lodash";
 
 const props = defineProps({
   photo: Object,
@@ -182,29 +183,84 @@ function onTagsWheel(e) {
   tagsOverlay.value.scrollTop += e.deltaY;
 }
 
-// supongo que tienes ya algo así para marcar tags
-function toggleTag(tag) {
-  tag.selected = !tag.selected;
-}
+const loadPhotosFromToolbar = async () => {
+  if (!props.toolbarOpen || !props.photo) return;
 
+  isLoading.value = true;
+  const basePosition = { x: 0, y: 0 };
+
+  generatedPhotos.value = await canvasStore.addPhotosFromPhoto(
+    [props.photo],
+    props.toolbarState.expansion.type,
+    100,
+    basePosition,
+    props.toolbarState.expansion.opposite,
+    props.toolbarState.expansion.inverted
+  );
+
+  resetVisiblePhotos();
+  await nextTick();
+  scrollContainer.value.scrollLeft = 0;
+  isLoading.value = false;
+};
+
+const loadPhotosFromSelectedTags = debounce(async () => {
+  const selectedTags = filteredTags.value
+    .filter((t) => t.tag.selected)
+    .map((t) => t.tag);
+
+  if (!props.photo || selectedTags.length === 0) {
+    generatedPhotos.value = [];
+    visiblePhotos.value = [];
+    return;
+  }
+
+  isLoading.value = true;
+  const basePosition = { x: 0, y: 0 };
+
+  const dynamicType = {
+    ...props.toolbarState.expansion.type,
+    selectedTags,
+  };
+
+  generatedPhotos.value = await canvasStore.addPhotosFromPhoto(
+    [props.photo],
+    dynamicType,
+    100,
+    basePosition,
+    props.toolbarState.expansion.opposite,
+    props.toolbarState.expansion.inverted
+  );
+
+  resetVisiblePhotos();
+  await nextTick();
+  scrollContainer.value.scrollLeft = 0;
+  isLoading.value = false;
+}, 2000);
+
+// nuevo watch: escucha los cambios en los tags seleccionados
+watch(
+  filteredTags,
+  () => {
+    if (
+      props.toolbarState.expansion.type.criteria === "tags" &&
+      !props.toolbarState.expansion.onCanvas
+    ) {
+      loadPhotosFromSelectedTags();
+    }
+  },
+  { deep: true }
+);
+
+// modificamos el watch original para que no actúe en modo tags/composition fuera del canvas
 watch(
   () => [props.toolbarOpen, props.photo, props.toolbarState.expansion.type],
-  async ([open, photo]) => {
-    if (!open || !photo) return;
-    isLoading.value = true;
-    const basePosition = { x: 0, y: 0 };
-    generatedPhotos.value = await canvasStore.addPhotosFromPhoto(
-      [photo],
-      props.toolbarState.expansion.type,
-      100,
-      basePosition,
-      props.toolbarState.expansion.opposite,
-      props.toolbarState.expansion.inverted
-    );
-    resetVisiblePhotos();
-    await nextTick();
-    scrollContainer.value.scrollLeft = 0;
-    isLoading.value = false;
+  async ([open, photo, type]) => {
+    const isInteractive = ["tags", "composition"].includes(type?.criteria);
+    const skip = isInteractive && !props.toolbarState.expansion.onCanvas;
+
+    if (!open || !photo || skip) return;
+    await loadPhotosFromToolbar();
   },
   { immediate: true }
 );

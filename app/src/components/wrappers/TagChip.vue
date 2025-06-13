@@ -8,15 +8,14 @@
     @mouseover="hovered = true"
     @mouseleave="hovered = false"
     :style="{
-      opacity: isSelected ? 0.9 : 0.7,
+      opacity: isSelected ? 0.9 : 0.9,
       'border-radius': pillHeight / 2 + 'px',
       'background-color': isSelected
         ? selectedColor
         : hovered
         ? hoverColor
         : defaultColor,
-      color: textColor,
-      fontWeight: isSelected ? '' : 'bold',
+      color: 'white',
       'font-size': fontSize + 'px',
       width: pillWidth + 'px',
       'justify-content': 'center',
