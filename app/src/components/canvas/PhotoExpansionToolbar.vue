@@ -33,7 +33,7 @@
       @wheel="onWheel"
     >
       <div class="original-photo">
-        <v-img :src="photo.src" class="original" width="170" cover />
+        <v-img :src="photo.src" class="original" width="210" cover />
         <!-- Overlay de tags sólo cuando el criterio sea 'tags' -->
         <div
           v-if="toolbarState.expansion.type.criteria === 'tags'"
@@ -70,7 +70,7 @@
             :src="photo.thumbnailUrl"
             :class="{ selected: selectedIds.includes(photo.id) }"
             class="photo"
-            width="170"
+            width="210"
             @click="toggleSelection(photo.id)"
           />
           <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
@@ -329,7 +329,7 @@ watch(
   left: 0;
   background: #1e1e1e;
   z-index: 1;
-  width: 170px;
+  width: 210px;
   height: auto;
   margin-bottom: 18px;
 }
@@ -347,16 +347,15 @@ watch(
 
 .tags-overlay {
   position: absolute;
-  top: 5px;
+  top: 8px;
   left: 8px;
   right: 8px;
-  bottom: 5px;
+  bottom: 8px;
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
   overflow-y: auto;
-  padding: 4px;
-  background: rgba(0, 0, 0, 0.2);
+  overflow-x: hidden;
   border-radius: 4px;
   z-index: 2;
   justify-content: center;

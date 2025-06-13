@@ -7,15 +7,21 @@
     @click.stop="isSelected = !isSelected"
     @mouseover="hovered = true"
     @mouseleave="hovered = false"
-    :color="modelValue ? selectedColor : hovered ? selectedColor : defaultColor"
     :style="{
-      opacity: 0.7,
+      opacity: isSelected ? 0.9 : 0.7,
       'border-radius': pillHeight / 2 + 'px',
+      'background-color': isSelected
+        ? selectedColor
+        : hovered
+        ? hoverColor
+        : defaultColor,
       color: textColor,
-      fontWeight: 'bold',
+      fontWeight: isSelected ? '' : 'bold',
       'font-size': fontSize + 'px',
       width: pillWidth + 'px',
       'justify-content': 'center',
+      // transform: hovered ? 'scale(1.08)' : 'scale(1)',
+      // transition: 'transform 0.1s ease-in-out',
     }"
   >
     {{ shortened }}
@@ -25,7 +31,6 @@
 <script setup>
 import { computed, ref } from "vue";
 import { shortenTag } from "@/utils/utils";
-import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
 
 const props = defineProps({
   tag: { type: Object, required: true },
@@ -46,7 +51,7 @@ const isSelected = computed({
   set: (val) => emit("update:modelValue", val),
 });
 
-const fontSize = 11;
+const fontSize = 12;
 const textPadding = 2;
 
 const shortened = computed(() => shortenTag(props.tag.name));
