@@ -353,12 +353,13 @@ watch(
   bottom: 5px;
   display: flex;
   flex-wrap: wrap;
-  gap: 0px;
+  gap: 5px;
   overflow-y: auto;
   padding: 4px;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   z-index: 2;
+  justify-content: center;
 }
 /* Scrollbar */
 .tags-overlay::-webkit-scrollbar {
