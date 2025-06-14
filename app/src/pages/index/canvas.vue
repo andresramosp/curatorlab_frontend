@@ -481,17 +481,31 @@ function handlePhotoDrop(event) {
   const containerRect = stage.container().getBoundingClientRect();
   const transform = stage.getAbsoluteTransform().copy().invert();
 
-  droppedPhotos.forEach((photo, index) => {
-    const offsetX = index * 30; // separación horizontal opcional
-    const offsetY = index * 30;
+  const pointer = {
+    x: event.clientX - containerRect.left,
+    y: event.clientY - containerRect.top,
+  };
 
-    const pointer = {
-      x: event.clientX - containerRect.left + offsetX,
-      y: event.clientY - containerRect.top + offsetY,
+  const stagePoint = transform.point(pointer);
+
+  const defaultWidth = 200;
+  const defaultHeight = 140;
+  const spreadOffset = 30; // distancia entre cada foto
+
+  droppedPhotos.forEach((photo, index) => {
+    const width = photo.config?.width || defaultWidth;
+    const height = photo.config?.height || defaultHeight;
+
+    const offsetX = spreadOffset * index;
+    const offsetY = spreadOffset * index;
+
+    photo.config = {
+      x: stagePoint.x - width / 2 + offsetX,
+      y: stagePoint.y - height / 2 + offsetY,
+      width,
+      height,
     };
 
-    const stagePoint = transform.point(pointer);
-    photo.config = { x: stagePoint.x, y: stagePoint.y };
     canvasStore.addPhotos([photo]);
     expansionToolbar.value?.removePhotoFromList(photo.id);
   });
@@ -500,7 +514,7 @@ function handlePhotoDrop(event) {
 const getPhotoStrokeColor = (photo) => {
   if (photo.inTrash) return "rgba(250, 11, 11, 0.5)";
   if (photo.selected) return accentColor;
-  if (photo.hovered) return primaryColor;
+  // if (photo.hovered) return primaryColor;
   return "gray";
 };
 
