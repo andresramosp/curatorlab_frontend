@@ -11,6 +11,7 @@
         :photo="photo"
         :toolbar-state="toolbarState"
         @photos-generated="handleGeneratedPhotos"
+        @loading="(val) => (isLoading = val)"
       />
 
       <!-- DERECHA: Botón cerrar + fotos relacionadas -->
@@ -26,23 +27,36 @@
           @scroll="handleScroll"
           @wheel="onWheel"
         >
-          <div
-            v-if="!isLoading"
-            class="photo-wrapper"
-            v-for="photo in visiblePhotos"
-            :key="photo.id"
-          >
-            <v-img
-              draggable="true"
-              @dragstart="(e) => onDragStart(e, photo)"
-              :src="photo.thumbnailUrl"
-              :class="{ selected: selectedIds.includes(photo.id) }"
-              class="photo"
-              width="210"
-              @click="toggleSelection(photo.id)"
-            />
-            <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
-          </div>
+          <template v-if="isLoading">
+            <div class="photo-wrapper" v-for="n in 6" :key="'skeleton-' + n">
+              <v-skeleton-loader
+                type="image"
+                width="210"
+                height="135"
+                class="photo"
+              />
+            </div>
+          </template>
+          <template v-else>
+            <div
+              class="photo-wrapper"
+              v-for="photo in visiblePhotos"
+              :key="photo.id"
+            >
+              <v-img
+                draggable="true"
+                @dragstart="(e) => onDragStart(e, photo)"
+                :src="photo.thumbnailUrl"
+                :class="{ selected: selectedIds.includes(photo.id) }"
+                class="photo"
+                width="210"
+                @click="toggleSelection(photo.id)"
+              />
+              <div class="score">
+                {{ Math.round((photo.score ?? 0) * 100) }}%
+              </div>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -52,7 +66,6 @@
 <script setup>
 import { nextTick, ref } from "vue";
 import PhotoBaseControls from "./PhotoBaseControls.vue";
-import { useCanvasStore } from "@/stores/canvas";
 
 const props = defineProps({
   photo: Object,

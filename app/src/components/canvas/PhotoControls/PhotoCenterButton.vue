@@ -9,7 +9,7 @@
       :config="{
         radius: buttonRadius,
         fill: fill,
-        opacity: 0.8,
+        opacity: 0.65,
       }"
     />
     <v-text

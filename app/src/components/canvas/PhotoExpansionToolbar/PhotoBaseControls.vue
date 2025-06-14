@@ -19,7 +19,7 @@
       />
     </div>
     <div class="original-photo">
-      <v-img :src="photo.src" class="original" width="220" cover />
+      <v-img :src="photo.src" class="original" width="210" cover />
       <!-- Overlay de tags -->
       <div
         v-if="toolbarState.expansion.type.criteria === 'tags'"
@@ -39,15 +39,15 @@
           :pill-height="pillHeight"
         />
       </div>
-      <div v-if="isLoading" class="loading-wrapper">
+      <!-- <div v-if="isLoading" class="loading-wrapper">
         <v-progress-circular indeterminate size="45" color="primary" />
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, nextTick } from "vue";
+import { ref, watch, nextTick, onMounted } from "vue";
 import { useCanvasStore } from "@/stores/canvas";
 import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
 import SelectMini from "@/components/wrappers/SelectMini.vue";
@@ -59,7 +59,7 @@ const props = defineProps({
   toolbarState: Object,
 });
 
-const emit = defineEmits(["photos-generated"]);
+const emit = defineEmits(["photos-generated", "loading"]);
 
 const canvasStore = useCanvasStore();
 
@@ -67,7 +67,7 @@ const { filteredTags, selectedColor, hoverColor, defaultColor, pillHeight } =
   useTagDisplay(() => props.photo.tags);
 
 const tagsOverlay = ref(null);
-const isLoading = ref(false);
+// const isLoading = ref(false);
 const pageSize = 100;
 
 function onTagsWheel(e) {
@@ -80,8 +80,7 @@ function resetAndEmit(photos) {
 
 const loadPhotosFromToolbar = async () => {
   if (!props.photo) return;
-  isLoading.value = true;
-
+  emit("loading", true);
   const basePosition = { x: 0, y: 0 };
 
   const result = await canvasStore.addPhotosFromPhoto(
@@ -94,7 +93,7 @@ const loadPhotosFromToolbar = async () => {
   );
 
   await nextTick();
-  isLoading.value = false;
+  emit("loading", false);
   resetAndEmit(result);
 };
 
@@ -108,7 +107,8 @@ const loadPhotosFromSelectedTags = debounce(async () => {
     return;
   }
 
-  isLoading.value = true;
+  emit("loading", true);
+
   const basePosition = { x: 0, y: 0 };
 
   const dynamicType = {
@@ -126,7 +126,8 @@ const loadPhotosFromSelectedTags = debounce(async () => {
   );
 
   await nextTick();
-  isLoading.value = false;
+  emit("loading", false);
+
   resetAndEmit(result);
 }, 2000);
 
@@ -163,6 +164,16 @@ watch(
     }
   }
 );
+
+function resetAllTags() {
+  filteredTags.value.forEach((tagPhoto) => {
+    tagPhoto.tag.selected = false;
+  });
+}
+
+onMounted(() => {
+  resetAllTags();
+});
 </script>
 
 <style scoped>
@@ -171,6 +182,7 @@ watch(
   flex-direction: column;
   width: 210px;
   margin-bottom: 20px;
+  margin-top: 6px;
 }
 
 .header {

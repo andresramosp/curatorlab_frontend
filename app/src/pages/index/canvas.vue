@@ -244,6 +244,7 @@
                 <TagPillsCanvas
                   v-if="
                     toolbarState.expansion.type.criteria === 'tags' &&
+                    toolbarState.expansion.onCanvas &&
                     photo.hovered
                   "
                   :photo="photo"
@@ -268,7 +269,11 @@
                   :sizeFactor="dynamicSizeFactor"
                 />
                 <PhotoCenterButton
-                  v-else-if="!photo.inTrash && photo.hovered"
+                  v-else-if="
+                    !toolbarState.expansion.onCanvas &&
+                    !photo.inTrash &&
+                    photo.hovered
+                  "
                   :photo="photo"
                   :fill="accentColor"
                   icon="+"
