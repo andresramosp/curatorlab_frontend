@@ -51,9 +51,15 @@ function selectItem(item) {
   display: inline-flex;
   align-items: center;
   cursor: pointer;
-  font-size: 13px;
   color: white;
   padding: 2px 4px;
   border-radius: 4px;
+}
+
+.v-list-item--density-compact.v-list-item--one-line {
+  min-height: 10px;
+}
+.v-list-item-title {
+  font-size: 14px;
 }
 </style>

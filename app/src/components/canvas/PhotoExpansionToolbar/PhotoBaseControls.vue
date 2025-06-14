@@ -5,16 +5,18 @@
         v-model="toolbarState.expansion.type"
         :items="[
           { label: 'General', value: { criteria: 'embedding' } },
+
           {
-            label: 'Context',
-            value: { criteria: 'semantic', fields: ['context'] },
-          },
-          {
-            label: 'Story',
+            label: 'Narrative',
             value: { criteria: 'semantic', fields: ['story'] },
           },
-          { label: 'Tags', value: { criteria: 'tags' } },
+          {
+            label: 'Cultural Context',
+            value: { criteria: 'semantic', fields: ['context'] },
+          },
+
           { label: 'Composition', value: { criteria: 'composition' } },
+          { label: 'Tags', value: { criteria: 'tags' } },
         ]"
       />
     </div>

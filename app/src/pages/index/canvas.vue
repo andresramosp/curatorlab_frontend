@@ -79,6 +79,25 @@
             tooltip="Unleash up to 5 related images directly onto the canvas"
           >
             <v-icon size="20" left>mdi-palette-outline</v-icon>
+            <SelectMini
+              v-if="toolbarState.expansion.onCanvas"
+              v-model="toolbarState.expansion.type"
+              :items="[
+                { label: 'General', value: { criteria: 'embedding' } },
+
+                {
+                  label: 'Narrative',
+                  value: { criteria: 'semantic', fields: ['story'] },
+                },
+                {
+                  label: 'Cultural Context',
+                  value: { criteria: 'semantic', fields: ['context'] },
+                },
+
+                { label: 'Composition', value: { criteria: 'composition' } },
+                { label: 'Tags', value: { criteria: 'tags' } },
+              ]"
+            />
           </ToggleOption>
         </ToggleButtons>
       </div>
@@ -371,6 +390,7 @@ import ToggleButtons from "@/components/wrappers/ToggleButtons.vue";
 import ToggleOption from "@/components/wrappers/ToggleOption.vue";
 import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar/PhotoExpansionToolbar.vue";
 import PhotoDialog from "@/components/PhotoDialog.vue";
+import SelectMini from "@/components/wrappers/SelectMini.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
