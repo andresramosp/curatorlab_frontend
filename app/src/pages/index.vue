@@ -57,7 +57,7 @@ const sections = [
   { title: "Search", icon: "mdi-magnify", route: "/search" },
 
   { title: "Canvas", icon: "mdi-artboard", route: "/canvas" },
-  { title: "Curator", icon: "mdi-palette-swatch", route: "/curator" },
+  // { title: "Curator", icon: "mdi-palette-swatch", route: "/curator" },
   // { title: "Settings", icon: "mdi-tune", route: "/settings" },
 ];
 

@@ -14,7 +14,7 @@
             value: { criteria: 'semantic', fields: ['story'] },
           },
           { label: 'Tags', value: { criteria: 'tags' } },
-          { label: 'Composition', value: { criteria: 'composition' } },
+          // { label: 'Composition', value: { criteria: 'composition' } },
         ]"
       />
     </div>
