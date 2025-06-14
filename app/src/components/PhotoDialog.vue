@@ -35,7 +35,7 @@
           </div>
 
           <!-- Sección de Tags agrupados por categoría -->
-          <v-row>
+          <!-- <v-row>
             <v-col cols="12">
               <v-expansion-panels>
                 <v-expansion-panel
@@ -65,10 +65,10 @@
                 </v-expansion-panel>
               </v-expansion-panels>
             </v-col>
-          </v-row>
+          </v-row> -->
 
           <!-- Sección de Descripciones -->
-          <v-row>
+          <!-- <v-row>
             <v-col cols="12">
               <v-expansion-panels>
                 <v-expansion-panel title="Descriptions">
@@ -96,7 +96,7 @@
                 </v-expansion-panel>
               </v-expansion-panels>
             </v-col>
-          </v-row>
+          </v-row> -->
         </v-container>
       </v-card-text>
       <v-card-actions>
