@@ -83,10 +83,10 @@
 <script setup>
 import { ref, watch, nextTick, computed } from "vue";
 import { useCanvasStore } from "@/stores/canvas";
-import SelectMini from "../wrappers/SelectMini.vue";
 import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
-import TagChip from "../wrappers/TagChip.vue";
 import { debounce } from "lodash";
+import SelectMini from "@/components/wrappers/SelectMini.vue";
+import TagChip from "@/components/wrappers/TagChip.vue";
 
 const props = defineProps({
   photo: Object,

@@ -323,10 +323,10 @@ import PhotoDetectionAreas from "@/components/canvas/PhotoControls/PhotoDetectio
 import PhotoDialogCanvas from "@/components/canvas/_PhotoDialogCanvas.vue";
 import { usePhotosStore } from "@/stores/photos";
 import Konva from "konva";
-import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar.vue";
 import PhotoCenterButton from "@/components/canvas/PhotoControls/PhotoCenterButton.vue";
 import ToggleButtons from "@/components/wrappers/ToggleButtons.vue";
 import ToggleOption from "@/components/wrappers/ToggleOption.vue";
+import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar/PhotoExpansionToolbar.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
