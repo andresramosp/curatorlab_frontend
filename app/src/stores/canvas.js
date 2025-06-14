@@ -14,6 +14,7 @@ function createPhoto(
   const hasCustomConfig = backendPhoto.config?.x != null;
 
   return {
+    ...backendPhoto,
     id: backendPhoto.id,
     src: backendPhoto.thumbnailUrl,
     config: hasCustomConfig

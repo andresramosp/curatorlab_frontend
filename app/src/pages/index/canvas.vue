@@ -196,6 +196,38 @@
                   strokeWidth: photo.selected ? 7 : 2.5,
                 }"
               />
+              <!-- Info icon -->
+              <v-group
+                v-if="
+                  photo.hovered &&
+                  toolbarState.expansion.type.criteria !== 'tags' &&
+                  !toolbarState.expansion.type.criteria !== 'composition'
+                "
+                :config="{ x: 10, y: 10 }"
+                @click="openPhotoDialog(photo)"
+              >
+                <v-circle
+                  :config="{
+                    radius: 5.5,
+                    stroke: 'white',
+                    strokeWidth: 1,
+                  }"
+                />
+                <v-text
+                  :config="{
+                    text: 'i',
+                    fontSize: 10.5,
+                    fill: 'white',
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    width: 20,
+                    height: 20,
+                    offsetX: 10,
+                    offsetY: 9,
+                  }"
+                />
+              </v-group>
+
               <!-- Spinner de carga -->
               <v-group
                 v-if="photo.loading && toolbarState.expansion.onCanvas"
@@ -299,6 +331,11 @@
       @add-photos="handleAddPhotos"
     />
 
+    <PhotoDialog
+      v-model:dialog="showDialog"
+      :selected-photo="selectedDialogPhoto"
+    />
+
     <div
       @click="dialogTrashVisible = true"
       :class="['trash-zone', { hovering: isHoveringTrash }]"
@@ -332,6 +369,7 @@ import PhotoCenterButton from "@/components/canvas/PhotoControls/PhotoCenterButt
 import ToggleButtons from "@/components/wrappers/ToggleButtons.vue";
 import ToggleOption from "@/components/wrappers/ToggleOption.vue";
 import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar/PhotoExpansionToolbar.vue";
+import PhotoDialog from "@/components/PhotoDialog.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
@@ -352,6 +390,14 @@ const toolbarState = ref({
     spreadMode: "perpendicular",
   },
 });
+
+const showDialog = ref(false);
+const selectedDialogPhoto = ref(null);
+
+function openPhotoDialog(photo) {
+  selectedDialogPhoto.value = photo;
+  showDialog.value = true;
+}
 
 const stageRef = ref(null);
 const containerRef = ref(null);
