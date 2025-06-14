@@ -273,3 +273,7 @@
   font-size: 16px;
   // margin-left: 4px;
 }
+
+.v-switch .v-selection-control {
+  min-height: 0px !important;
+}

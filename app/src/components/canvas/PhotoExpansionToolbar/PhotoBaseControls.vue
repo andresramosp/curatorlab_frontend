@@ -11,13 +11,32 @@
             value: { criteria: 'semantic', fields: ['story'] },
           },
           {
-            label: 'Cultural Context',
+            label: 'Context',
             value: { criteria: 'semantic', fields: ['context'] },
           },
 
           { label: 'Composition', value: { criteria: 'composition' } },
           { label: 'Tags', value: { criteria: 'tags' } },
         ]"
+      />
+      <v-switch
+        v-if="toolbarState.expansion.type.criteria == 'composition'"
+        label="Inverted"
+        color="secondary"
+        class="switch-compact"
+        v-model="toolbarState.expansion.inverted"
+        density="compact"
+        hide-details
+      />
+      <v-switch
+        v-else
+        label="Opposite"
+        label-position="top"
+        color="secondary"
+        class="switch-compact"
+        v-model="toolbarState.expansion.opposite"
+        density="compact"
+        hide-details
       />
     </div>
 
@@ -197,6 +216,24 @@ watch(
 );
 
 watch(
+  () => [
+    props.toolbarState.expansion.opposite,
+    props.toolbarState.expansion.inverted,
+  ],
+  async () => {
+    const { criteria } = props.toolbarState.expansion.type;
+    if (
+      (criteria === "tags" || criteria === "composition") &&
+      !props.toolbarState.expansion.onCanvas
+    ) {
+      loadPhotosFromSelections();
+    } else {
+      loadPhotosFromToolbar();
+    }
+  }
+);
+
+watch(
   () => props.toolbarState.expansion.type.criteria,
   (newCriteria) => {
     if (newCriteria === "tags" || newCriteria === "composition") {
@@ -228,11 +265,11 @@ onMounted(() => {
 
 .header {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
   color: white;
   font-size: 14px;
   margin-bottom: 5px;
+  justify-content: space-between;
 }
 
 .original-photo {

@@ -90,7 +90,7 @@
                   value: { criteria: 'semantic', fields: ['story'] },
                 },
                 {
-                  label: 'Cultural Context',
+                  label: 'Context',
                   value: { criteria: 'semantic', fields: ['context'] },
                 },
 
