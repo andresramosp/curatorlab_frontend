@@ -91,7 +91,7 @@
         <v-btn @click="zoomTick(-1)" icon size="small" class="outline">
           <v-icon>mdi-minus</v-icon>
         </v-btn>
-        <v-btn @click="fitStageToPhotos" icon size="small" class="outline">
+        <v-btn @click="fitStageToPhotos(0.1)" icon size="small" class="outline">
           <v-icon>mdi-crop-free</v-icon>
         </v-btn>
         <v-btn
@@ -266,6 +266,7 @@
                 <PhotoDetectionAreas
                   v-if="
                     toolbarState.expansion.type.criteria === 'composition' &&
+                    toolbarState.expansion.onCanvas &&
                     photo.hovered
                   "
                   :photo="photo"
@@ -582,14 +583,13 @@ const handleClearCanvas = () => {
   updateStageOffset();
 };
 
-const fitStageToPhotos = () => {
+const fitStageToPhotos = (extraPaddingRatio = 0.1) => {
   if (!photos.value.length) return;
 
   const stage = stageRef.value.getStage();
   const containerWidth = stage.width() - TOOLBAR_WIDTH; // Restamos el ancho de la toolbar
   const containerHeight = stage.height();
   const margin = 40;
-  const extraPaddingRatio = 0.8; // 10% de padding
 
   // Bounding box de todas las fotos
   const bounds = photos.value.reduce(
@@ -658,7 +658,7 @@ async function handleAddPhotos(photoIds) {
     .map((id) => photosStore.photos.find((p) => p.id == id))
     .filter(Boolean);
   canvasStore.addPhotos(photosToAdd);
-  fitStageToPhotos();
+  fitStageToPhotos(0.8);
 }
 
 function zoomTick(direction = 1) {

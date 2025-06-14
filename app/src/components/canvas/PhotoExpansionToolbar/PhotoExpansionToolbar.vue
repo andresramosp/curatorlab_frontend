@@ -92,6 +92,7 @@ function handleGeneratedPhotos(photos) {
 }
 
 function removePhotoFromList(photoId) {
+  selectedIds.value = selectedIds.value.filter((id) => id != photoId);
   generatedPhotos.value = generatedPhotos.value.filter((p) => p.id !== photoId);
   visiblePhotos.value = visiblePhotos.value.filter((p) => p.id !== photoId);
 }
@@ -195,7 +196,7 @@ function onDragStart(ev, photo) {
   overflow-x: auto;
   overflow-y: hidden;
   flex-wrap: nowrap;
-  gap: 12px;
+  gap: 15px;
   padding: 5px;
   height: 100%; /* asegúrate de que hereda correctamente */
   scroll-behavior: smooth;
@@ -211,7 +212,7 @@ function onDragStart(ev, photo) {
   transition: transform 0.2s;
 }
 .photo:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 .selected {
   outline: 3px solid rgb(var(--v-theme-accent));
