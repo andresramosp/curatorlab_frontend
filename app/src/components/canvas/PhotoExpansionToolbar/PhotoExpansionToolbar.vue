@@ -5,75 +5,44 @@
     elevation="6"
     color="surface"
   >
-    <div class="header">
-      <SelectMini
-        v-model="toolbarState.expansion.type"
-        :items="[
-          { label: 'General', value: { criteria: 'embedding' } },
-          {
-            label: 'Context',
-            value: { criteria: 'semantic', fields: ['context'] },
-          },
-          {
-            label: 'Story',
-            value: { criteria: 'semantic', fields: ['story'] },
-          },
-          { label: 'Tags', value: { criteria: 'tags' } },
-          { label: 'Composition', value: { criteria: 'composition' } },
-        ]"
+    <div class="toolbar-content">
+      <!-- IZQUIERDA: Foto original con miniselect -->
+      <PhotoBaseControls
+        :photo="photo"
+        :toolbar-state="toolbarState"
+        @photos-generated="handleGeneratedPhotos"
       />
-      <v-btn icon size="small" class="close-btn" @click="close">
-        <v-icon>mdi-close</v-icon>
-      </v-btn>
-    </div>
-    <div
-      class="photos-container"
-      ref="scrollContainer"
-      @scroll="handleScroll"
-      @wheel="onWheel"
-    >
-      <div class="original-photo">
-        <v-img :src="photo.src" class="original" width="210" cover />
-        <!-- Overlay de tags sólo cuando el criterio sea 'tags' -->
-        <div
-          v-if="toolbarState.expansion.type.criteria === 'tags'"
-          class="tags-overlay"
-          ref="tagsOverlay"
-          @wheel.prevent="onTagsWheel"
-        >
-          <TagChip
-            v-for="tagPhoto in filteredTags"
-            :key="tagPhoto.tag.id"
-            :tag="tagPhoto.tag"
-            v-model="tagPhoto.tag.selected"
-            :selected-color="selectedColor"
-            :hover-color="hoverColor"
-            :default-color="defaultColor"
-            :text-color="'white'"
-            :pill-height="pillHeight"
-          />
+
+      <!-- DERECHA: Botón cerrar + fotos relacionadas -->
+      <div class="related-section">
+        <div class="header">
+          <v-btn icon size="small" class="close-btn" @click="close">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
         </div>
-        <div v-if="isLoading" class="loading-wrapper">
-          <v-progress-circular indeterminate size="45" color="primary" />
-        </div>
-      </div>
-      <div class="related-photos">
         <div
-          v-if="!isLoading"
-          class="photo-wrapper"
-          v-for="photo in visiblePhotos"
-          :key="photo.id"
+          class="related-photos"
+          ref="scrollContainer"
+          @scroll="handleScroll"
+          @wheel="onWheel"
         >
-          <v-img
-            draggable="true"
-            @dragstart="(e) => onDragStart(e, photo)"
-            :src="photo.thumbnailUrl"
-            :class="{ selected: selectedIds.includes(photo.id) }"
-            class="photo"
-            width="210"
-            @click="toggleSelection(photo.id)"
-          />
-          <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
+          <div
+            v-if="!isLoading"
+            class="photo-wrapper"
+            v-for="photo in visiblePhotos"
+            :key="photo.id"
+          >
+            <v-img
+              draggable="true"
+              @dragstart="(e) => onDragStart(e, photo)"
+              :src="photo.thumbnailUrl"
+              :class="{ selected: selectedIds.includes(photo.id) }"
+              class="photo"
+              width="210"
+              @click="toggleSelection(photo.id)"
+            />
+            <div class="score">{{ Math.round((photo.score ?? 0) * 100) }}%</div>
+          </div>
         </div>
       </div>
     </div>
@@ -81,60 +50,53 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, computed } from "vue";
+import { nextTick, ref } from "vue";
+import PhotoBaseControls from "./PhotoBaseControls.vue";
 import { useCanvasStore } from "@/stores/canvas";
-import { useTagDisplay } from "@/composables/canvas/useTagsDisplay";
-import { debounce } from "lodash";
-import SelectMini from "@/components/wrappers/SelectMini.vue";
-import TagChip from "@/components/wrappers/TagChip.vue";
 
 const props = defineProps({
   photo: Object,
   toolbarState: Object,
   toolbarOpen: Boolean,
 });
-const emit = defineEmits(["update:toolbarOpen", "add-photos-expanded"]);
+const emit = defineEmits(["update:toolbarOpen"]);
 
-const {
-  filteredTags,
-  selectedColor,
-  hoverColor,
-  defaultColor,
-  textColor,
-  pillHeight,
-} = useTagDisplay(() => props.photo.tags);
-
-const canvasStore = useCanvasStore();
 const generatedPhotos = ref([]);
 const visiblePhotos = ref([]);
 const selectedIds = ref([]);
 const isLoading = ref(false);
-const pageSize = 100;
 const chunkSize = 6;
-
+const pageSize = 100;
 const scrollContainer = ref(null);
-const tagsOverlay = ref(null);
+
+function handleGeneratedPhotos(photos) {
+  generatedPhotos.value = photos;
+  visiblePhotos.value = photos.slice(0, pageSize);
+  selectedIds.value = [];
+  nextTick(() => {
+    scrollContainer.value?.scrollTo({ left: 0 });
+  });
+}
 
 function removePhotoFromList(photoId) {
   generatedPhotos.value = generatedPhotos.value.filter((p) => p.id !== photoId);
   visiblePhotos.value = visiblePhotos.value.filter((p) => p.id !== photoId);
-  selectedIds.value = selectedIds.value.filter((id) => id !== photoId);
 }
 
 defineExpose({ removePhotoFromList });
 
-function onDragStart(ev, photo) {
-  const photosToDrag =
-    selectedIds.value.length > 0
-      ? generatedPhotos.value.filter((p) => selectedIds.value.includes(p.id))
-      : [photo];
-
-  const data = JSON.stringify(photosToDrag);
-  ev.dataTransfer?.setData("application/json", data);
+function close() {
+  selectedIds.value = [];
+  generatedPhotos.value = [];
+  visiblePhotos.value = [];
+  emit("update:toolbarOpen", false);
 }
 
-function resetVisiblePhotos() {
-  visiblePhotos.value = generatedPhotos.value.slice(0, pageSize);
+function onWheel(e) {
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    e.preventDefault();
+    scrollContainer.value.scrollLeft += e.deltaY;
+  }
 }
 
 function handleScroll() {
@@ -162,108 +124,15 @@ function toggleSelection(photoId) {
   }
 }
 
-function close() {
-  selectedIds.value = [];
-  generatedPhotos.value = [];
-  visiblePhotos.value = [];
-  emit("update:toolbarOpen", false);
+function onDragStart(ev, photo) {
+  const photosToDrag =
+    selectedIds.value.length > 0
+      ? generatedPhotos.value.filter((p) => selectedIds.value.includes(p.id))
+      : [photo];
+
+  const data = JSON.stringify(photosToDrag);
+  ev.dataTransfer?.setData("application/json", data);
 }
-
-function onWheel(e) {
-  // Si es más vertical que horizontal, convertimos a scroll horizontal
-  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-    e.preventDefault();
-    scrollContainer.value.scrollLeft += e.deltaY;
-  }
-  // Si es horizontal (deltaX), lo dejamos pasar sin tocar nada
-}
-
-function onTagsWheel(e) {
-  // mueve el scroll interno
-  tagsOverlay.value.scrollTop += e.deltaY;
-}
-
-const loadPhotosFromToolbar = async () => {
-  if (!props.toolbarOpen || !props.photo) return;
-
-  isLoading.value = true;
-  const basePosition = { x: 0, y: 0 };
-
-  generatedPhotos.value = await canvasStore.addPhotosFromPhoto(
-    [props.photo],
-    props.toolbarState.expansion.type,
-    100,
-    basePosition,
-    props.toolbarState.expansion.opposite,
-    props.toolbarState.expansion.inverted
-  );
-
-  resetVisiblePhotos();
-  await nextTick();
-  scrollContainer.value.scrollLeft = 0;
-  isLoading.value = false;
-};
-
-const loadPhotosFromSelectedTags = debounce(async () => {
-  const selectedTags = filteredTags.value
-    .filter((t) => t.tag.selected)
-    .map((t) => t.tag);
-
-  if (!props.photo || selectedTags.length === 0) {
-    generatedPhotos.value = [];
-    visiblePhotos.value = [];
-    return;
-  }
-
-  isLoading.value = true;
-  const basePosition = { x: 0, y: 0 };
-
-  const dynamicType = {
-    ...props.toolbarState.expansion.type,
-    selectedTags,
-  };
-
-  generatedPhotos.value = await canvasStore.addPhotosFromPhoto(
-    [props.photo],
-    dynamicType,
-    100,
-    basePosition,
-    props.toolbarState.expansion.opposite,
-    props.toolbarState.expansion.inverted
-  );
-
-  resetVisiblePhotos();
-  await nextTick();
-  scrollContainer.value.scrollLeft = 0;
-  isLoading.value = false;
-}, 2000);
-
-// nuevo watch: escucha los cambios en los tags seleccionados
-watch(
-  filteredTags,
-  () => {
-    if (
-      props.toolbarState.expansion.type.criteria === "tags" &&
-      !props.toolbarState.expansion.onCanvas
-    ) {
-      loadPhotosFromSelectedTags();
-    }
-  },
-  { deep: true }
-);
-
-// modificamos el watch original para que no actúe en modo tags/composition fuera del canvas
-watch(
-  () => [props.toolbarOpen, props.photo, props.toolbarState.expansion.type],
-  async ([open, photo, type]) => {
-    const isInteractive = ["tags", "composition"].includes(type?.criteria);
-    const skip = isInteractive && !props.toolbarState.expansion.onCanvas;
-
-    if (!open || !photo || skip) return;
-    await loadPhotosFromToolbar();
-  },
-  { immediate: true }
-);
 </script>
 
 <style scoped>
@@ -273,55 +142,55 @@ watch(
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-bottom: 5px;
-  padding-top: 5px;
+  padding: 5px 15px;
+}
+
+.toolbar-content {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.related-section {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0; /* CLAVE para que scroll-x funcione bien */
 }
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
+  height: 30px;
+  min-height: 30px;
+  padding-right: 5px;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.close-btn {
   color: white;
-  font-size: 14px;
+  font-size: 10px;
+  width: 25px;
+  height: 25px;
 }
 
-.title-group {
+.related-photos {
   display: flex;
-  flex-direction: column;
-}
-
-.title {
-  font-weight: bold;
-}
-
-.expansion-type {
-  color: #aaa;
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.photos-container {
-  display: flex;
-  align-items: baseline;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-wrap: nowrap;
   gap: 12px;
-  padding: 4px 0;
-  scrollbar-width: none;
-  overflow: hidden;
-}
-
-.photos-container::-webkit-scrollbar {
-  height: 8px;
-}
-.photos-container::-webkit-scrollbar-thumb {
-  background: rgba(100, 100, 100, 0.5);
-  border-radius: 4px;
+  padding: 5px;
+  height: 100%; /* asegúrate de que hereda correctamente */
+  scroll-behavior: smooth;
 }
 
 .photo-wrapper {
-  position: relative;
   flex: 0 0 auto;
+  position: relative;
 }
 
 .photo {
@@ -343,85 +212,6 @@ watch(
   color: white;
   font-size: 11px;
   padding: 2px 5px;
-  border-radius: 3px;
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.close-btn {
-  margin-left: auto;
-  color: white;
-  font-size: 10px;
-  width: 25px;
-  height: 25px;
-}
-
-.original-photo .label {
-  margin-top: 4px;
-  color: #aaa;
-  font-size: 11px;
-}
-
-.related-photos {
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  gap: 12px;
-  flex: 1;
-  padding: 5px;
-  /* scrollbar-width: none; */
-}
-
-.original-photo {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  left: 0;
-  background: #1e1e1e;
-  z-index: 1;
-  width: 210px;
-  height: auto;
-  margin-bottom: 18px;
-}
-
-.original-photo .original {
-  border: 2px solid rgb(var(--v-theme-secondary));
-}
-
-.loading-wrapper {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.tags-overlay {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  border-radius: 4px;
-  z-index: 2;
-  justify-content: center;
-}
-/* Scrollbar */
-.tags-overlay::-webkit-scrollbar {
-  width: 6px;
-}
-.tags-overlay::-webkit-scrollbar-thumb {
-  background: rgba(100, 100, 100, 0.5);
   border-radius: 3px;
 }
 </style>

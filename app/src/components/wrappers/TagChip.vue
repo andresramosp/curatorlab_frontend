@@ -19,7 +19,7 @@
       'font-size': fontSize + 'px',
       width: pillWidth + 'px',
       'justify-content': 'center',
-      // transform: hovered ? 'scale(1.08)' : 'scale(1)',
+      // transform: hovered ? 'scale(1.1)' : 'scale(1)',
       // transition: 'transform 0.1s ease-in-out',
     }"
   >
