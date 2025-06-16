@@ -115,7 +115,7 @@
       >
         <!-- Agrupación principal de controles -->
         <div style="display: flex; gap: 10px; align-items: center">
-          <ToggleButtons v-model="searchType">
+          <ToggleButtons v-model="searchType" class="mx-3">
             <ToggleOption
               value="semantic"
               tooltip="Enter the query in natural language"
@@ -136,7 +136,7 @@
             </ToggleOption>
           </ToggleButtons>
 
-          <ToggleButtons v-model="searchMode">
+          <ToggleButtons v-model="searchMode" class="mx-3">
             <ToggleOption
               value="logical"
               tooltip="Perform a heavy search with logical criteria and conceptual precision."

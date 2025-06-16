@@ -3,7 +3,6 @@
     v-model="value"
     color="secondary"
     mandatory
-    class="mx-3"
     style="height: auto !important; justify-content: center"
   >
     <slot />

@@ -50,19 +50,7 @@
             </v-btn>
           </template>
         </v-tooltip>
-        <v-tooltip text="Settings" location="bottom">
-          <template #activator="{ props }">
-            <v-btn
-              icon
-              @click="() => {}"
-              size="small"
-              class="mx-auto outline"
-              v-bind="props"
-            >
-              <v-icon size="22">mdi-cog</v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
+        <SettingsMenu :toolbar-state="toolbarState" />
       </div>
 
       <div class="floating-controls-explore">
@@ -391,6 +379,7 @@ import ToggleOption from "@/components/wrappers/ToggleOption.vue";
 import PhotoExpansionToolbar from "@/components/canvas/PhotoExpansionToolbar/PhotoExpansionToolbar.vue";
 import PhotoDialog from "@/components/PhotoDialog.vue";
 import SelectMini from "@/components/wrappers/SelectMini.vue";
+import SettingsMenu from "@/components/canvas/SettingsMenu.vue";
 
 const canvasStore = useCanvasStore();
 const photosStore = usePhotosStore();
@@ -701,7 +690,8 @@ onMounted(() => {
   stageConfig.height = containerRef.value.clientHeight - 64; // restamos height del header
   const stage = stageRef.value.getStage();
   stage.on("dragmove", updateStageOffset);
-  orderPhotos();
+  // orderPhotos();
+  fitStageToPhotos();
   updateStageOffset();
 });
 

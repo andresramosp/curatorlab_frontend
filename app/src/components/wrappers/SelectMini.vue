@@ -9,7 +9,7 @@
 
     <v-list density="compact">
       <v-list-item
-        v-for="item in items"
+        v-for="item in normalizedItems"
         :key="item.label"
         @click="selectItem(item)"
       >
@@ -23,18 +23,25 @@
 import { computed, ref } from "vue";
 
 const props = defineProps({
-  modelValue: [String, Number, Object],
+  modelValue: [String, Number, Object, Boolean],
   items: {
     type: Array,
-    required: true, // [{ label, value }]
+    required: true,
   },
 });
 const emit = defineEmits(["update:modelValue"]);
 
 const menu = ref(false);
 
+// Normalizar items
+const normalizedItems = computed(() =>
+  props.items.map((i) =>
+    typeof i === "object" && i !== null ? i : { label: String(i), value: i }
+  )
+);
+
 const selectedLabel = computed(() => {
-  const found = props.items.find(
+  const found = normalizedItems.value.find(
     (i) => JSON.stringify(i.value) === JSON.stringify(props.modelValue)
   );
   return found?.label ?? "—";

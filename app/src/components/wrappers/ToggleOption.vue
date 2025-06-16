@@ -45,4 +45,8 @@ export default {
 .toggle-option-small {
   height: 35px !important;
 }
+.toggle-option-x-small {
+  height: 25px !important;
+  width: 10px !important;
+}
 </style>
