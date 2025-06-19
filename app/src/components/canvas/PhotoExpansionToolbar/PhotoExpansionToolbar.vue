@@ -52,8 +52,36 @@
                 width="210"
                 @click="toggleSelection(photo.id)"
               />
+
+              <!-- OVERLAY DE COMPOSITION -->
+              <div
+                v-if="
+                  toolbarState.expansion.type.criteria === 'composition' &&
+                  photo.detectionAreas
+                "
+                class="composition-overlay"
+              >
+                <div
+                  v-for="area in photo.detectionAreas"
+                  :key="area.id"
+                  class="composition-box"
+                  :style="getBoxStyleForMiniature(area)"
+                />
+              </div>
+
               <div class="score">
                 {{ Math.round((photo.score ?? 0) * 100) }}%
+              </div>
+
+              <div v-if="photo.matchingTags?.length" class="matching-tags">
+                <v-chip
+                  v-for="tag in photo.matchingTags.slice(0, 3)"
+                  :key="tag.id || tag.name"
+                  size="x-small"
+                  class="tag-pill highlight-tag-positive"
+                >
+                  {{ tag.name || tag }}
+                </v-chip>
               </div>
             </div>
           </template>
@@ -147,6 +175,28 @@ function onDragStart(ev, photo) {
   const data = JSON.stringify(photosToDrag);
   ev.dataTransfer?.setData("application/json", data);
 }
+
+function getBoxStyleForMiniature(detection) {
+  const s = 0.14;
+  const x = detection.x1 * s;
+  const y = detection.y1 * s;
+  const width = (detection.x2 - detection.x1) * s;
+  const height = (detection.y2 - detection.y1) * s;
+
+  return {
+    position: "absolute",
+    left: `${x}px`,
+    top: `${y}px`,
+    width: `${width}px`,
+    height: `${height}px`,
+    border: "1.5px solid white",
+    backgroundColor: detection.selected
+      ? "rgba(var(--v-theme-secondary), 0.4)"
+      : "transparent",
+    pointerEvents: "auto",
+    zIndex: 3,
+  };
+}
 </script>
 
 <style scoped>
@@ -227,5 +277,19 @@ function onDragStart(ev, photo) {
   font-size: 11px;
   padding: 2px 5px;
   border-radius: 3px;
+}
+
+.composition-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 210px;
+  height: 135px; /* o proporcional si usas otro aspect ratio */
+  z-index: 2;
+  pointer-events: none;
+}
+
+.composition-box {
+  pointer-events: none;
 }
 </style>

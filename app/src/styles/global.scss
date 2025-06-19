@@ -158,8 +158,8 @@
 }
 
 .switch-compact .v-label {
-  font-size: 12px !important;
-  margin-inline-start: 4px;
+  font-size: 13px !important;
+  margin-inline-start: 3px;
 }
 
 // .select-compact .v-label {
@@ -237,11 +237,29 @@
 }
 
 .highlight-tag-positive {
-  background-color: rgb(var(--v-theme-accent)) !important;
+  background-color: rgba(var(--v-theme-accent), 0.8) !important;
   color: darkslategray !important;
 }
 .highlight-tag-negative {
   background-color: red !important;
+}
+
+.tag-pill {
+  font-size: 10px !important;
+  height: 18px !important;
+  border-radius: 9px !important;
+}
+
+.matching-tags {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  z-index: 5;
+  padding: 3px;
 }
 
 .minimal-select {

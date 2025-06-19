@@ -260,7 +260,7 @@ onMounted(() => {
   flex-direction: column;
   width: 210px;
   margin-bottom: 20px;
-  margin-top: 6px;
+  margin-top: 2px;
 }
 
 .header {

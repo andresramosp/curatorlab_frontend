@@ -201,23 +201,6 @@ function deletePhoto(id) {
 }
 
 /* Estilos para las pills de tags en la parte inferior */
-.matching-tags {
-  position: absolute;
-  bottom: 4px;
-  left: 4px;
-  right: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  z-index: 5;
-  padding: 5px;
-}
-
-.tag-pill {
-  font-size: 10px !important;
-  height: 18px !important;
-  border-radius: 9px !important;
-}
 
 .thinking-overlay {
   position: absolute;
